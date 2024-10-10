@@ -1,7 +1,7 @@
 # Ambient-Intelligence
 Modified Industrial Visualizer for People Tracking
 
-Sensor: IWR6843< br / >
+Sensor: IWR6843<br/>
 Datasheet link: [https://www.ti.com/product/IWR6843#reference-designs](url)
 
 ## Application Visualizer source code:
