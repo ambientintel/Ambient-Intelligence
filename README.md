@@ -7,6 +7,9 @@ Datasheet link: [https://www.ti.com/product/IWR6843#reference-designs](url)
 ## Application Visualizer source code:
 C:\ti\radar_toolbox_2_20_00_05\tools\visualizers\Applications_Visualizer
 
+## Circuit Board Design Info
+
+
 ### Flash Setup:
 
 Location: C:\ti\radar_toolbox_2_20_00_05\source\ti\examples\People_Tracking\3D_People_Tracking\prebuilt_binaries
