@@ -37,6 +37,7 @@ This sets boundaries where static points can be used by the tracker and tracks a
 
 - **boundaryBox**: [Xmin] [Xmax] [Ymin] [yMax] [Zmin] [Zmax]<br/>
 This sets boundaries where tracks can exists. Only points inside the box will be used by the tracker. Each value denotes an edge of the 3D cube.
+
 | Parameters  | Example Value | Dimension | Description |
 | ------------- | ------------- | ------------- | ------------- |
 | X-min (float) | -3.5 | m | Minimum horizontal distance with respect to the origin in the World co-ordinates |
