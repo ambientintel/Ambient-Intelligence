@@ -33,10 +33,7 @@ This sets boundaries where tracks can exists. Only points inside the box will be
 
 | Parameter sets  | CLI Commands | Description |
 | ------------- | ------------- | ------------- |
-| Scenery Parameters  | boundaryBox
-staticBoundaryBox
-sensorPosition
-presenceBoundaryBox  | Content Cell  |
+| Scenery Parameters  | boundaryBox, staticBoundaryBox, sensorPosition, presenceBoundaryBox  | These define the dimensions of the physical space in which the tracker will operate. These also specify the radar sensor orientation and position. Any measurement points outside these boundary boxes will not be used by the tracker.  |
 | Gating Parameters  | Content Cell  | Content Cell  |
 | Allocation Parameters  | Content Cell  | Content Cell  |
 | State Parameters  | Content Cell  | Content Cell  |
