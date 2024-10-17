@@ -64,7 +64,7 @@ A high-level description of the parameter sets and the corresponding CLI command
 
 ![image](https://github.com/user-attachments/assets/d2c313e1-d05c-42ba-986c-8b66ce53edc3)
 
-For further tuning, refer [here] (Documentation/Motion_Presence_Detection_Demo_Group_Tracker_Tuning_Guide.pdf)
+For further tuning, refer [here](Documentation/Motion_Presence_Detection_Demo_Group_Tracker_Tuning_Guide.pdf)
 
 ## Device architecture and Processing chain
 
