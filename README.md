@@ -44,4 +44,12 @@ A high-level description of the parameter sets and the corresponding CLI command
 
 ![image](https://github.com/user-attachments/assets/d2c313e1-d05c-42ba-986c-8b66ce53edc3)
 
+## Device architecture and Processing chain
+
+### Tracking module in the overall processing chain
+![image](https://github.com/user-attachments/assets/e68dd8bd-bd5d-47b4-9753-bab573356c56)
+
+The input to the group tracker is a set of measurement points from the detection layer called the “point cloud”. Each of the measurement point obtained from the detection layer includes in spherical coordinates the measured range, azimuth, elevation, and radial velocity of the point. The tracker motion model used is a 3D constant acceleration model characterized by a 9 element State vector S: [𝑥(𝑛) 𝑦(𝑛) 𝑧(𝑛) 𝑥̇(𝑛) 𝑦̇(𝑛) 𝑧̇(𝑛) 𝑥̈(𝑛) 𝑦̈(𝑛) 𝑧̈(𝑛)] in Cartesian space. It should be noted that the measurement vector is related to the state vector through a non-linear transformation (due to trigonometric operations required to convert from spherical to Cartesian coordinates). A variant of Kalman Filter called the Extended Kalman Filter (EKF) is used in the group tracker that linearizes the nonlinear function using the derivative of the non-linear function around current state estimates. Please refer to the group tracker implementation guide for more details on the algorithm [1].
+
+
 
