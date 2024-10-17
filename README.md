@@ -31,13 +31,17 @@ This sets boundaries where tracks can exists. Only points inside the box will be
 
 ### Configuration Parameters for the Group Tracker and their CLI commands
 
+A high-level description of the parameter sets and the corresponding CLI command
+
 | Parameter sets  | CLI Commands | Description |
 | ------------- | ------------- | ------------- |
 | Scenery Parameters  | boundaryBox, staticBoundaryBox, sensorPosition, presenceBoundaryBox  | These define the dimensions of the physical space in which the tracker will operate. These also specify the radar sensor orientation and position. Any measurement points outside these boundary boxes will not be used by the tracker.  |
-| Gating Parameters  | Content Cell  | Content Cell  |
-| Allocation Parameters  | Content Cell  | Content Cell  |
-| State Parameters  | Content Cell  | Content Cell  |
-| Max Acceleration Parameters  | Content Cell  | Content Cell  |
-| Tracker Configuration Parameters  | Content Cell  | Content Cell  |
+| Gating Parameters  | gatingParam   | These determine the maximum volume and velocity of a tracked object and are used to associate measurement points with tracks that already exist. Points detected beyond the limits set by these parameters will not be included in the set of points that make up the tracked object.  |
+| Allocation Parameters  | allocationParam   | These are used to detect new tracks/people in the scene. When detected points are not associated with existing tracks, allocation parameters are used to cluster these remaining points and determine if that cluster qualifies as a person/target.  |
+| State Parameters  | stateParam   | The state transition parameters determine the state of a tracking instance. Any tracking instance can be in one of three states: FREE, DETECT, or ACTIVE.  |
+| Max Acceleration Parameters  | maxAcceleration   | These parameters determine the maximum acceleration in the lateral, longitudinal, and vertical directions.  |
+| Tracker Configuration Parameters  | trackingCfg  | These parameters are used to enable the Tracker Module and determine the amount of memory to allocate based on maximum number of points and tracks. It also configures the radial velocity parameters (initial velocity, velocity resolution, max velocity) and frame rate at which the tracker is to operate.  |
+
+![image](https://github.com/user-attachments/assets/d2c313e1-d05c-42ba-986c-8b66ce53edc3)
 
 
