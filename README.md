@@ -26,7 +26,7 @@ Download `Final_config_6m.cfg` to location `'C:\ti\radar_toolbox_2_20_00_05\sour
 - **staticBoundaryBox**: [Xmin] [Xmax] [Ymin] [yMax] [Zmin] [Zmax]<br/>
 This sets boundaries where static points can be used by the tracker and tracks are allowed to become static. Each value denotes an edge of the 3D cube. Currently, it is recommend to keep minY greater than or equal to 2.<br/>
 | Parameters  | Example Value  | Dimension  | Description  |
-| ------------- | ------------- | ------------- |------------- |
+| ------------- | ------------- | ------------- | ------------- |
 | X-min (float)  | -3  | m  | Minimum horizontal distance with respect to the origin in the World co-ordinates  |
 | X-max (float)  | 3  | m  | Maximum horizontal distance with respect to the origin in the World co-ordinates  |
 | Y-min (float)  | 0.5  | m  | Minimum vertical distance with respect to the origin in the World co-ordinates  |
