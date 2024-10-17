@@ -24,7 +24,7 @@ Data port speed: 921600
 Download `Final_config_6m.cfg` to location `'C:\ti\radar_toolbox_2_20_00_05\source\ti\examples\People_Tracking\3D_People_Tracking\chirp_configs'`. Below are instructions to configure the file based on individual preferences:
 
 - **staticBoundaryBox**: [Xmin] [Xmax] [Ymin] [yMax] [Zmin] [Zmax]<br/>
-This sets boundaries where static points can be used by the tracker and tracks are allowed to become static. Each value denotes an edge of the 3D cube. Currently, it is recommend to keep minY greater than or equal to 2.
+This sets boundaries where static points can be used by the tracker and tracks are allowed to become static. Each value denotes an edge of the 3D cube. Currently, it is recommend to keep minY greater than or equal to 2.<br/>
 | Parameters  | Example Value  | Dimension  | Description  |
 | ------------- | ------------- | ------------- |------------- |
 | X-min (float)  | -3  | m  | Minimum horizontal distance with respect to the origin in the World co-ordinates  |
