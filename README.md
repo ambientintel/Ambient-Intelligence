@@ -16,7 +16,7 @@ Location: C:\ti\radar_toolbox_2_20_00_05\source\ti\examples\People_Tracking\3D_P
 
 ![image](https://github.com/user-attachments/assets/a187bb92-6799-4768-938e-4e438d84f819)
 
-Enhanced port speed: 115200< br / >
+Enhanced port speed: 115200<br/>
 Data port speed: 921600
 
 ## Config file for accurate fall Detection in Industrial Visualizer
@@ -28,5 +28,19 @@ This sets boundaries where static points can be used by the tracker and tracks a
 
 - **boundaryBox**: [Xmin] [Xmax] [Ymin] [yMax] [Zmin] [Zmax]<br/>
 This sets boundaries where tracks can exists. Only points inside the box will be used by the tracker. Each value denotes an edge of the 3D cube.
+
+### Configuration Parameters for the Group Tracker and their CLI commands
+
+| Parameter sets  | CLI Commands | Description |
+| ------------- | ------------- | ------------- |
+| Scenery Parameters  | boundaryBox
+staticBoundaryBox
+sensorPosition
+presenceBoundaryBox  | Content Cell  |
+| Gating Parameters  | Content Cell  | Content Cell  |
+| Allocation Parameters  | Content Cell  | Content Cell  |
+| State Parameters  | Content Cell  | Content Cell  |
+| Max Acceleration Parameters  | Content Cell  | Content Cell  |
+| Tracker Configuration Parameters  | Content Cell  | Content Cell  |
 
 
