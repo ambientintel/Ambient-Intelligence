@@ -16,4 +16,10 @@ if __name__=="__main__":
     c = core()
     c.parser.connectComPorts(cliCom, dataCom)
 
-    print(c.parser.dataCom)
+    # print(c.parser.dataCom)
+    # print(c.parser.cliCom)
+
+    while True:
+        trial_output = c.parser.readAndParseUartDoubleCOMPort()
+        print("Read and parse UART")
+        print(trial_output)
