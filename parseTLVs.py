@@ -31,11 +31,6 @@ def parsePointCloudTLV(tlvData, tlvLength, outputDict):
         pointCloud[i,3] = doppler
     outputDict['numDetectedPoints'], outputDict['pointCloud'] = numPoints, pointCloud
 
-def parseAntSymbols(tlvData, tlvLength, outputDict):
-    # This is not implemented yet because there is no corresponding view for it. 
-    # It can be implemented by following the format in the steering vectors guide.
-    pass
-
 def parseADCSamples(tlvData, tlvLength, outputDict):
     adcDataStruct = 'h'
     adcDataSize = struct.calcsize(adcDataStruct)
