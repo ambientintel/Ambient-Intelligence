@@ -1,6 +1,10 @@
 import serial 
 import time
 import datetime
+import os
+import math
+import json
+import sys
 
 # Logger
 import logging
@@ -271,3 +275,44 @@ class UARTParser():
 #     s = ser.read(bytecount)
 #     print(s)
 
+# ser.close()
+
+    def sendCfg(self, cfg):
+        # Remove empty lines from the cfg
+        cfg = [line for line in cfg if line != '\n']
+        # Ensure \n at end of each line
+        cfg = [line + '\n' if not line.endswith('\n') else line for line in cfg]
+        # Remove commented lines
+        cfg = [line for line in cfg if line[0] != '%']
+
+        for line in cfg:
+            time.sleep(.03) # Line delay
+
+            if(self.cliCom.baudrate == 1250000):
+                for char in [*line]:
+                    time.sleep(.001) # Character delay. Required for demos which are 1250000 baud by default else characters are skipped
+                    self.cliCom.write(char.encode())
+            else:
+                self.cliCom.write(line.encode())
+                
+            ack = self.cliCom.readline()
+            print(ack, flush=True)
+            ack = self.cliCom.readline()
+            print(ack, flush=True)
+            if (self.isLowPowerDevice):
+                ack = self.cliCom.readline()
+                print(ack, flush=True)
+                ack = self.cliCom.readline()
+                print(ack, flush=True)
+
+            splitLine = line.split()
+            if(splitLine[0] == "baudRate"): # The baudrate CLI line changes the CLI baud rate on the next cfg line to enable greater data streaming off the xWRL device.
+                try:
+                    self.cliCom.baudrate = int(splitLine[1])
+                except:
+                    log.error("Error - Invalid baud rate")
+                    sys.exit(1)
+        # Give a short amount of time for the buffer to clear
+        time.sleep(0.03)
+        self.cliCom.reset_input_buffer()
+        # NOTE - Do NOT close the CLI port because 6432 will use it after configuration  
