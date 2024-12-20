@@ -44,7 +44,7 @@ class UARTParser():
         log.info('Connected')
 
 
-    def setSaveBinary(self, saveBinary):
+    def setSaveBinary(self, saveBinary = 1):
         self.saveBinary = saveBinary
 
     # This function is always called - first read the UART, then call a function to parse the specific demo output
@@ -135,25 +135,25 @@ class UARTParser():
             #     self.binData = []
  
             # Saving data here for replay
-            frameJSON = {}
-            frameJSON['frameData'] = outputDict
-            frameJSON['timestamp'] = time.time()
-            frameJSON['CurrTime'] = time.ctime(frameJSON['timestamp']) # Add human-readable timestamp
+            # frameJSON = {}
+            # frameJSON['frameData'] = outputDict
+            # frameJSON['timestamp'] = time.time()
+            # # frameJSON['CurrTime'] = time.ctime(frameJSON['timestamp']) # Add human-readable timestamp
 
-            self.frames.append(frameJSON)
-            data['data'] = self.frames
+            # self.frames.append(frameJSON)
+            # data['data'] = self.frames
 
-            if (self.uartCounter % self.framesPerFile == 0):
-                if(self.first_file is True): 
-                    if(os.path.exists('binData/') == False):
-                        # Note that this will create the folder in the caller's path, not necessarily in the viz folder            
-                        os.mkdir('binData/')
-                    os.mkdir('binData/'+self.filepath)
-                    self.first_file = False
-                with open('./binData/'+self.filepath+'/replay_' + str(math.floor(self.uartCounter/self.framesPerFile)) + '.json', 'w') as fp:
-                    json_object = json.dumps(data, indent=4)
-                    fp.write(json_object)
-                    # self.frames = [] uncomment to put data into one file at a time in 100 frame chunks
+            # if (self.uartCounter % self.framesPerFile == 0):
+            #     if(self.first_file is True): 
+            #         if(os.path.exists('binData/') == False):
+            #             # Note that this will create the folder in the caller's path, not necessarily in the viz folder            
+            #             os.mkdir('binData/')
+            #         os.mkdir('binData/'+self.filepath)
+            #         self.first_file = False
+            #     with open('./binData/'+self.filepath+'/replay_' + str(math.floor(self.uartCounter/self.framesPerFile)) + '.json', 'w') as fp:
+            #         json_object = json.dumps(data, indent=4)
+            #         fp.write(json_object)
+            #         # self.frames = [] uncomment to put data into one file at a time in 100 frame chunks
         
         return outputDict
 
@@ -266,7 +266,7 @@ class UARTParser():
                 with open('./binData/'+self.filepath+'/replay_' + str(math.floor(self.uartCounter/self.framesPerFile)) + '.json', 'w') as fp:
                     json_object = json.dumps(data, indent=4)
                     fp.write(json_object)
-                    # self.frames = [] uncomment to put data into one file at a time in 100 frame chunks
+                    self.frames = [] #uncomment to put data into one file at a time in 100 frame chunks
         
         return outputDict
 
