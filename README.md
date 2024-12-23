@@ -168,8 +168,9 @@ cd Ambient-Intelligence
 
 ### Update the latest Repository onto the local branch
 
-Run the following command to update your local repository with the latest package version.
+First, navigate to the location where your repository is stored and run the following command to update your local repository with the latest package version. 
 ```bash
+cd Ambient-Intelligence
 git pull origin main
 ```
 ---
