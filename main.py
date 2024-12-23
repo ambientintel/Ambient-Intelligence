@@ -11,6 +11,7 @@ from serial.tools import list_ports
 from contextlib import suppress
 import sys
 
+
 class core:
     def __init__(self):
         self.parser = UARTParser(type="DoubleCOMPort")
@@ -260,7 +261,7 @@ if __name__=="__main__":
                                 if (fallDetectionDisplayResults[tid] > 0): 
                                     height_str = height_str + " FALL DETECTED"
                                     print("Alert: Fall Detected for Patient")
-        frameJSON['fallDetected'] = height_str                                
+        # frameJSON['fallDetected'] = height_str                                
         c.frames.append(frameJSON)
         data['data'] = c.frames
         # print(data)
@@ -277,3 +278,4 @@ if __name__=="__main__":
                 c.frames = [] #uncomment to put data into one file at a time in 100 frame chunks
 
         # print(c.fallDetection.heightBuffer)
+    

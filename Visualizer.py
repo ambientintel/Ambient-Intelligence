@@ -3,6 +3,7 @@ import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 from datastream import UARTParser
 import time
+from serial.tools import list_ports
 
 class LiveSensorVisualization:
     def __init__(self):
@@ -91,9 +92,34 @@ class LiveSensorVisualization:
             plt.close()
 
 def main():
+
+    CLI_SIL_SERIAL_PORT_NAME = 'Enhanced COM Port'
+    DATA_SIL_SERIAL_PORT_NAME = 'Standard COM Port'
+
+    serialPorts = list(list_ports.comports())
+
+    
+    print("Welcome to the Fall Detection System. Please type \"L\" if you are using Linux or \"W\" if you are using Windows")
+    operatingSystem = input("Enter your operating system: ")
+    if operatingSystem == "L":
+        cliCom = '/dev/ttyUSB0'
+        dataCom = '/dev/ttyUSB1'
+    elif operatingSystem == "W":
+        for port in serialPorts:
+            if (CLI_SIL_SERIAL_PORT_NAME in port.description):   
+                cliCom = port.device
+            if (DATA_SIL_SERIAL_PORT_NAME in port.description):
+                dataCom = port.device
+        if (cliCom == None or dataCom == None):    
+            cliCom = input("CLI COM port not found for devices. Please enter the CLI COM port: ")
+            dataCom = input("DATA COM port not found for devices. Please enter the DATA COM port: ")
     # Get COM port inputs
-    cliCom = input("Enter the CLI COM port: ")
-    dataCom = input("Enter the Data COM port: ")
+    # cliCom = input("Enter the CLI COM port: ")
+    # dataCom = input("Enter the Data COM port: ")
+
+    #for linux
+    # cliCom = '/dev/ttyUSB0'
+    # dataCom = '/dev/ttyUSB1'
 
     # Create and run visualization
     visualizer = LiveSensorVisualization()
