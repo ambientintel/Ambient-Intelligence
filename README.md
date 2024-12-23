@@ -4,6 +4,26 @@ Modified Industrial Visualizer for People Tracking
 Sensor: IWR6843<br/>
 Datasheet link: [https://www.ti.com/product/IWR6843#reference-designs](url)
 
+---
+
+## Table of Contents
+- [Application Visualizer Source Code](#application-visualizer-source-code)
+- [Circuit Board Design Info](#circuit-board-design-info)
+- [Flash Setup](#flash-setup)
+- [Configuration Files](#config-file-for-accurate-fall-detection-in-industrial-visualizer)
+- [Device Architecture and Processing Chain](#device-architecture-and-processing-chain)
+- [How to Run the Package](#how-to-run-the-package)
+  - [Prerequisites](#prerequisites)
+  - [Clone the Repository](#clone-the-repository)
+  - [Install Dependencies](#install-dependencies)
+  - [Run the Main File](#run-the-main-file)
+  - [Troubleshooting](#troubleshooting)
+- [Processed Data](#processed-data)
+- [Contribution](#contribution)
+- [License](#license)
+
+---
+
 ## Application Visualizer source code:
 C:\ti\radar_toolbox_2_20_00_05\tools\visualizers\Applications_Visualizer
 
