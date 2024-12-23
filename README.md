@@ -130,7 +130,7 @@ Use Git to clone this repository to your local machine at your desired directory
 ##### On Linux:
 ```bash
 git clone https://github.com/Turtlelord-2k/Ambient-Intelligence.git
-cd repository-name
+cd Ambient-Intelligence
 ```
 
 ##### On Windows:
@@ -138,7 +138,7 @@ cd repository-name
 2. Run the following commands:
    ```bash
    git clone https://github.com/Turtlelord-2k/Ambient-Intelligence.git
-   cd repository-name
+   cd Ambient-Intelligence
    ```
 
 ---
