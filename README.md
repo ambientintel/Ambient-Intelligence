@@ -177,6 +177,12 @@ python main.py
 
 ---
 
+Processed Data
+
+The processed sensor data, including height data, will be saved in the binData directory as JSON files.
+
+---
+
 ### Contribution
 
 Feel free to fork this repository and submit pull requests for improvements or fixes.
