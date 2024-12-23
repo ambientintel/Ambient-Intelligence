@@ -179,7 +179,7 @@ pip install -r requirements.txt
 
 ### Run the Main File
 
-Run the main script to execute the project.
+Before running the main file, run the Industrial Visualizer once, then run the main script to execute the project. This tens to run the package smoothly. (This bug is being worked on)
 
 ##### On Linux:
 ```bash
