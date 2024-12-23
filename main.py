@@ -7,6 +7,9 @@ import time
 import math
 import numpy as np
 from fall_detection import FallDetection 
+from serial.tools import list_ports
+from contextlib import suppress
+import sys
 
 class core:
     def __init__(self):
@@ -17,75 +20,185 @@ class core:
         self.framesPerFile = 100
         self.filepath = datetime.datetime.now().strftime("%m_%d_%Y_%H_%M_%S")
         self.cfg = ""
-        self.demo = ""
+        self.demo = "3D People Tracking"
         self.device = "xWR6843"
         self.uartCounter = 0
         self.first_file = True
         self.fallDetection = FallDetection()
 
-# def save_tracking_data(data, filepath=None):
-#     """
-#     Save tracking data to a JSON file with current timestamp in the filename.
-    
-#     Args:
-#         data (dict): The data to be saved in JSON format
-#         filepath (str, optional): Custom filepath for saving. If None, uses default.
-#     """
-#     # Get current timestamp and format it for the filename
-#     timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
-    
-#     # Determine the filepath
-#     if filepath is None:
-#         filename = f"TrackingData_{timestamp}.json"
-#     else:
-#         # Ensure directory exists
-#         os.makedirs(os.path.dirname(filepath), exist_ok=True)
-        
-#         # If filepath is a directory, create filename in that directory
-#         if os.path.isdir(filepath):
-#             filename = os.path.join(filepath, f"TrackingData_{timestamp}.json")
-#         else:
-#             filename = filepath
-    
-#     # Save the data to the JSON file
-#     try:
-#         with open(filename, 'w') as json_file:
-#             json.dump(data, json_file, indent=4)
-#         print(f"Data successfully saved to {filename}")
-#     except IOError as e:
-#         print(f"Error saving file: {e}")
+        # self.demoClassDict = {
+        #     DEMO_OOB_x843: OOBx843(),
+        #     DEMO_OOB_x432: OOBx432(),
+        #     DEMO_3D_PEOPLE_TRACKING: PeopleTracking(),
+        #     DEMO_VITALS: VitalSigns(),
+        #     DEMO_SMALL_OBSTACLE: SmallObstacle(),
+        #     DEMO_GESTURE: GestureRecognition(),
+        #     DEMO_SURFACE: SurfaceClassification(),
+        #     DEMO_LEVEL_SENSING: LevelSensing(),
+        #     DEMO_GROUND_SPEED: TrueGroundSpeed(),
+        #     DEMO_LONG_RANGE: LongRangePD(),
+        #     DEMO_MOBILE_TRACKER: MobileTracker(),
+        #     DEMO_KTO: KickToOpen(),
+        #     DEMO_CALIBRATION: Calibration(),
+        #     DEMO_DASHCAM: Dashcam(),
+        #     DEMO_EBIKES: EBikes(),
+        #     DEMO_VIDEO_DOORBELL: VideoDoorbell(),
+        #     DEMO_TWO_PASS_VIDEO_DOORBELL: TwoPassVideoDoorbell(),
+        # }
 
-# def periodic_save(core_instance, filepath=None, interval=100):
-#     """
-#     Periodically save tracking data
-    
-#     Args:
-#         core_instance (core): The core instance containing tracking data
-#         filepath (str, optional): Custom filepath for saving
-#         interval (int): Interval between saves in seconds
-#     """
-#     def save_routine():
-#         while True:
-#             time.sleep(interval)
-#             with core_instance.save_lock:
-#                 if core_instance.tracking_data:
-#                     save_tracking_data(core_instance.tracking_data, filepath)
-    
-#     # Start the saving thread as a daemon
-#     save_thread = threading.Thread(target=save_routine, daemon=True)
-#     save_thread.start()
-#     return save_thread
+    # Populated with all devices and the demos each of them can run
+    # DEVICE_DEMO_DICT = {
+    #     "xWR6843": {
+    #         "isxWRx843": True,
+    #         "isxWRLx432": False,
+    #         "singleCOM": False,
+    #         "demos": [PeopleTracking()]
+    #     }
+    # }
+
+    def parseCfg(self, fname):
+        # if (self.replay):
+        #     self.cfg = self.data['cfg']
+        # else:
+        with open(fname, "r") as cfg_file:
+            self.cfg = cfg_file.readlines()
+            self.parser.cfg = self.cfg
+            self.parser.demo = self.demo
+            self.parser.device = self.device
+        for line in self.cfg:
+            args = line.split()
+            if len(args) > 0:
+                # trackingCfg
+                if args[0] == "trackingCfg":
+                    if len(args) < 5:
+                        print("trackingCfg had fewer arguments than expected")
+                    # else:
+                    #     with suppress(AttributeError):
+                    #         self.demoClassDict[self.demo].parseTrackingCfg(args)
+                elif args[0] == "SceneryParam" or args[0] == "boundaryBox":
+                    if len(args) < 7:
+                        print(
+                            "SceneryParam/boundaryBox had fewer arguments than expected"
+                        )
+                    # else:
+                    #     with suppress(AttributeError):
+                    #         self.demoClassDict[self.demo].parseBoundaryBox(args)
+                elif args[0] == "frameCfg":
+                    if len(args) < 4:
+                        print("frameCfg had fewer arguments than expected")
+                    # else:
+                    #     self.frameTime = float(args[5]) / 2
+                # elif args[0] == "sensorPosition":
+                    # sensorPosition for x843 family has 3 args
+                    # if DEVICE_DEMO_DICT[self.device]["isxWRx843"] and len(args) < 4:
+                    #     print("sensorPosition had fewer arguments than expected")
+                    # elif DEVICE_DEMO_DICT[self.device]["isxWRLx432"] and len(args) < 6:
+                    #     print("sensorPosition had fewer arguments than expected")
+                    # else:
+                    #     with suppress(AttributeError):
+                    #         self.demoClassDict[self.demo].parseSensorPosition(
+                    #             args, DEVICE_DEMO_DICT[self.device]["isxWRx843"]
+                    #         )
+                # Only used for Small Obstacle Detection
+                # elif args[0] == "occStateMach":
+                #     numZones = int(args[1])
+                # Only used for Small Obstacle Detection
+                elif args[0] == "zoneDef":
+                    if len(args) < 8:
+                        print("zoneDef had fewer arguments than expected")
+                    # else:
+                    #     with suppress(AttributeError):
+                    #         self.demoClassDict[self.demo].parseBoundaryBox(args)
+                elif args[0] == "mpdBoundaryBox":
+                    if len(args) < 8:
+                        print("mpdBoundaryBox had fewer arguments than expected")
+                    # else:
+                    #     with suppress(AttributeError):
+                    #         self.demoClassDict[self.demo].parseBoundaryBox(args)
+                elif args[0] == "chirpComnCfg":
+                    if len(args) < 8:
+                        print("chirpComnCfg had fewer arguments than expected")
+                    # else:
+                    #     with suppress(AttributeError):
+                    #         self.demoClassDict[self.demo].parseChirpComnCfg(args)
+                elif args[0] == "chirpTimingCfg":
+                    if len(args) < 6:
+                        print("chirpTimingCfg had fewer arguments than expected")
+                    # else:
+                    #     with suppress(AttributeError):
+                    #         self.demoClassDict[self.demo].parseChirpTimingCfg(args)
+                # TODO This is specifically guiMonitor for 60Lo, this parsing will break the gui when an SDK 3 config is sent
+                # elif args[0] == "guiMonitor":
+                #     if DEVICE_DEMO_DICT[self.device]["isxWRLx432"]:
+                #         if len(args) < 12:
+                #             print("guiMonitor had fewer arguments than expected")
+                #         else:
+                #             with suppress(AttributeError):
+                #                 self.demoClassDict[self.demo].parseGuiMonitor(args)
+                # elif args[0] == "presenceDetectCfg":
+                #     with suppress(AttributeError):
+                #         self.demoClassDict[self.demo].parsePresenceDetectCfg(args)
+                # elif args[0] == "sigProcChainCfg2":
+                #     with suppress(AttributeError):
+                #         self.demoClassDict[self.demo].parseSigProcChainCfg2(args)
+                elif args[0] == "mpdBoundaryArc":
+                    if len(args) < 8:
+                        print("mpdBoundaryArc had fewer arguments than expected")
+                #     else:
+                #         with suppress(AttributeError):
+                #             self.demoClassDict[self.demo].parseBoundaryBox(args)
+                # elif args[0] == "measureRangeBiasAndRxChanPhase":
+                #     with suppress(AttributeError):
+                #         self.demoClassDict[self.demo].parseRangePhaseCfg(args)
+                # elif args[0] == "clutterRemoval":
+                #     with suppress(AttributeError):
+                #         self.demoClassDict[self.demo].parseClutterRemovalCfg(args)
+                # elif args[0] == "sigProcChainCfg":
+                #     with suppress(AttributeError):
+                #         self.demoClassDict[self.demo].parseSigProcChainCfg(args)
+                # elif args[0] == "channelCfg":
+                #     with suppress(AttributeError):
+                #         self.demoClassDict[self.demo].parseChannelCfg(args)
+
+        # Initialize 1D plot values based on cfg file
+        # with suppress(AttributeError):
+        #     self.demoClassDict[self.demo].setRangeValues()
+
+    def sendCfg(self):
+        try:
+            self.parser.sendCfg(self.cfg)
+            sys.stdout.flush()
+            self.parseTimer.start(int(self.frameTime))  # need this line
+        except Exception as e:
+            print(e)
+            print("Parsing .cfg file failed. Did you select the right file?")
+
 
 if __name__=="__main__":
     # Optional: Specify a custom save filepath
     SAVE_FILEPATH = "./Data_files"  # Change this to your desired path
-    
-    # cliCom = input("Enter the CLI COM port: ")
-    # dataCom = input("Enter the Data COM port: ")
+    CLI_SIL_SERIAL_PORT_NAME = 'Enhanced COM Port'
+    DATA_SIL_SERIAL_PORT_NAME = 'Standard COM Port'
 
-    #for windows
-    cliCom = 'COM5'
-    dataCom = 'COM3'
+    serialPorts = list(list_ports.comports())
+
+    
+    print("Welcome to the Fall Detection System. Please type \"L\" if you are using Linux or \"W\" if you are using Windows")
+    operatingSystem = input("Enter your operating system: ")
+    if operatingSystem == "L":
+        cliCom = '/dev/ttyUSB0'
+        dataCom = '/dev/ttyUSB1'
+    elif operatingSystem == "W":
+        for port in serialPorts:
+            if (CLI_SIL_SERIAL_PORT_NAME in port.description):   
+                cliCom = port.device
+            if (DATA_SIL_SERIAL_PORT_NAME in port.description):
+                dataCom = port.device
+        if (cliCom == None or dataCom == None):    
+            cliCom = input("CLI COM port not found for devices. Please enter the CLI COM port: ")
+            dataCom = input("DATA COM port not found for devices. Please enter the DATA COM port: ")
+
+
 
     #for linux
     # cliCom = '/dev/ttyUSB0'
@@ -93,26 +206,17 @@ if __name__=="__main__":
 
     c = core()
     c.parser.connectComPorts(cliCom, dataCom)
+    # c.parseCfg("Final_config_6m.cfg")
+    # c.sendCfg()
 
 
-    # Start periodic saving thread
 
     while True:
         trial_output = c.parser.readAndParseUartDoubleCOMPort()
         # print("Read and parse UART")
         # print(trial_output)
 
-            # Add to tracking data list
-            # with c.save_lock:
-            #     c.tracking_data.append(trial_output)
-
-    #     except Exception as e:
-    #         print(f"An error occurred: {e}")
-    #         break
-    # periodic_save_thread = periodic_save(c, filepath=SAVE_FILEPATH)
-        # fd_buffer = c.fallDetection.step(heights = trial_output['heightData'], tracks = trial_output['trackData'])
-        # print(fd_buffer)
-
+    
         data = {'cfg': c.cfg, 'demo': c.demo, 'device': c.device}
         c.uartCounter += 1
         frameJSON = {}

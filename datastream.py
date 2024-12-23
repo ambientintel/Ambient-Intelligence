@@ -28,7 +28,7 @@ class UARTParser():
         self.parserType = type
         self.dataCom = None
         self.isLowPowerDevice = False
-        self.cfg = ""
+        self.cfg = "./Final_config_6m.cfg"
         self.demo = ""
         self.device = "xWR6843"
         self.frames = [] # TODO this needs to be reset if connection is reset
