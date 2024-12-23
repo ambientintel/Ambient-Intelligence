@@ -100,6 +100,30 @@ The input to the group tracker is a set of measurement points from the detection
 
 Before running the code, ensure you have the following installed on your system:
 
+#### Install Python
+Ensure Python (version 3.8 or later) is installed on your system. Open the command prompt on Windows or Terminal in Linux and run the below command to check the current Python version
+```bash
+python --version
+```
+
+If no Python version exists, follow the below instructions
+
+##### On Linux:
+```bash
+sudo apt update
+sudo apt install python3 python3-pip
+```
+
+##### On Windows:
+1. Download Python from the [official Python website](https://www.python.org/downloads/).
+2. During installation, select "Add Python to PATH".
+3. Verify the installation:
+   ```bash
+   python --version
+   ```
+
+---
+
 #### Install Git
 
 ##### On Linux:
@@ -124,24 +148,7 @@ git --version
 ```
 You should see the installed Git version.
 
-#### Install Python
-Ensure Python (version 3.8 or later) is installed on your system.
 
-##### On Linux:
-```bash
-sudo apt update
-sudo apt install python3 python3-pip
-```
-
-##### On Windows:
-1. Download Python from the [official Python website](https://www.python.org/downloads/).
-2. During installation, select "Add Python to PATH".
-3. Verify the installation:
-   ```bash
-   python --version
-   ```
-
----
 
 ### Clone the Repository
 
