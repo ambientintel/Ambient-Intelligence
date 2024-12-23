@@ -166,6 +166,12 @@ cd Ambient-Intelligence
    cd Ambient-Intelligence
    ```
 
+### Update the latest Repository onto the local branch
+
+Run the following command to update your local repository with the latest package version.
+```bash
+git pull origin main
+```
 ---
 
 ### Install Dependencies
