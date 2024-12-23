@@ -84,12 +84,12 @@ if __name__=="__main__":
     # dataCom = input("Enter the Data COM port: ")
 
     #for windows
-    # cliCom = 'COM5'
-    # dataCom = 'COM3'
+    cliCom = 'COM5'
+    dataCom = 'COM3'
 
     #for linux
-    cliCom = '/dev/ttyUSB0'
-    dataCom = '/dev/ttyUSB1'
+    # cliCom = '/dev/ttyUSB0'
+    # dataCom = '/dev/ttyUSB1'
 
     c = core()
     c.parser.connectComPorts(cliCom, dataCom)
