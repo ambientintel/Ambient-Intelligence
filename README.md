@@ -75,3 +75,118 @@ The input to the group tracker is a set of measurement points from the detection
 
 
 
+## How to run the package
+### Prerequisites
+
+Before running the code, ensure you have the following installed on your system:
+
+#### Install Git
+
+##### On Linux:
+```bash
+sudo apt update
+sudo apt install git-all
+```
+
+##### On Windows:
+1. Download Git for Windows from the [official Git website](https://git-scm.com/).
+2. Run the installer and follow the setup instructions.
+3. Ensure the option "Add Git to PATH" is selected during installation.
+4. Alternatively, you can install Git via pip:
+   ```bash
+   pip install python-git
+   ```
+   Note: This method installs the GitPython library for managing Git repositories programmatically. To use Git commands, the standard Git installation is recommended.
+
+To verify the installation, open a terminal or command prompt and run:
+```bash
+git --version
+```
+You should see the installed Git version.
+
+#### Install Python
+Ensure Python (version 3.8 or later) is installed on your system.
+
+##### On Linux:
+```bash
+sudo apt update
+sudo apt install python3 python3-pip
+```
+
+##### On Windows:
+1. Download Python from the [official Python website](https://www.python.org/downloads/).
+2. During installation, select "Add Python to PATH".
+3. Verify the installation:
+   ```bash
+   python --version
+   ```
+
+---
+
+### Clone the Repository
+
+Use Git to clone this repository to your local machine at your desired directory.
+
+##### On Linux:
+```bash
+git clone https://github.com/Turtlelord-2k/Ambient-Intelligence.git
+cd repository-name
+```
+
+##### On Windows:
+1. Open Command Prompt or Git Bash.
+2. Run the following commands:
+   ```bash
+   git clone https://github.com/Turtlelord-2k/Ambient-Intelligence.git
+   cd repository-name
+   ```
+
+---
+
+### Install Dependencies
+
+Install the required Python dependencies using `pip`:
+```bash
+pip install -r requirements.txt
+```
+
+---
+
+### Run the Main File
+
+Run the main script to execute the project.
+
+##### On Linux:
+```bash
+python3 main.py
+```
+
+##### On Windows:
+```bash
+python main.py
+```
+
+---
+
+### Troubleshooting
+
+- **Issue**: "Command not found" for `git` or `python`.
+  - **Solution**: Ensure Git and Python are correctly installed and added to your system PATH.
+- **Issue**: Missing Python dependencies.
+  - **Solution**: Check `requirements.txt` and ensure all dependencies are installed using `pip install -r requirements.txt`.
+
+---
+
+### Contribution
+
+Feel free to fork this repository and submit pull requests for improvements or fixes.
+
+---
+
+### License
+
+This project is licensed under the MIT License. See the `LICENSE` file for more details.
+
+
+
+
