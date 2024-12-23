@@ -207,8 +207,8 @@ if __name__=="__main__":
 
     c = core()
     c.parser.connectComPorts(cliCom, dataCom)
-    # c.parseCfg("Final_config_6m.cfg")
-    # c.sendCfg()
+    c.parseCfg("Final_config_6m.cfg")
+    c.sendCfg()
 
 
 

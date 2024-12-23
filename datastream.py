@@ -295,23 +295,23 @@ class UARTParser():
             else:
                 self.cliCom.write(line.encode())
                 
-            ack = self.cliCom.readline()
-            print(ack, flush=True)
-            ack = self.cliCom.readline()
-            print(ack, flush=True)
-            if (self.isLowPowerDevice):
-                ack = self.cliCom.readline()
-                print(ack, flush=True)
-                ack = self.cliCom.readline()
-                print(ack, flush=True)
+            # ack = self.cliCom.readline()
+            # print(ack, flush=True)
+            # ack = self.cliCom.readline()
+            # print(ack, flush=True)
+            # if (self.isLowPowerDevice):
+            #     ack = self.cliCom.readline()
+            #     print(ack, flush=True)
+            #     ack = self.cliCom.readline()
+            #     print(ack, flush=True)
 
-            splitLine = line.split()
-            if(splitLine[0] == "baudRate"): # The baudrate CLI line changes the CLI baud rate on the next cfg line to enable greater data streaming off the xWRL device.
-                try:
-                    self.cliCom.baudrate = int(splitLine[1])
-                except:
-                    log.error("Error - Invalid baud rate")
-                    sys.exit(1)
+            # splitLine = line.split()
+            # if(splitLine[0] == "baudRate"): # The baudrate CLI line changes the CLI baud rate on the next cfg line to enable greater data streaming off the xWRL device.
+            #     try:
+            #         self.cliCom.baudrate = int(splitLine[1])
+            #     except:
+            #         log.error("Error - Invalid baud rate")
+            #         sys.exit(1)
         # Give a short amount of time for the buffer to clear
         time.sleep(0.03)
         self.cliCom.reset_input_buffer()
