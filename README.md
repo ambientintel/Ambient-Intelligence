@@ -122,8 +122,6 @@ sudo apt install python3 python3-pip
    python --version
    ```
 
----
-
 #### Install Git
 
 ##### On Linux:
@@ -148,7 +146,7 @@ git --version
 ```
 You should see the installed Git version.
 
-
+---
 
 ### Clone the Repository
 
