@@ -10,7 +10,7 @@ from fall_detection import FallDetection
 from serial.tools import list_ports
 from contextlib import suppress
 import sys
-
+import platform
 
 class core:
     def __init__(self):
@@ -184,12 +184,13 @@ if __name__=="__main__":
     serialPorts = list(list_ports.comports())
 
     
-    print("Welcome to the Fall Detection System. Please type \"L\" if you are using Linux or \"W\" if you are using Windows")
-    operatingSystem = input("Enter your operating system: ")
-    if operatingSystem == "L":
+    print("Welcome to the Fall Detection System.")
+    # operatingSystem = input("Enter your operating system: ")
+    system = platform.system()
+    if system  == "Linux":
         cliCom = '/dev/ttyUSB0'
         dataCom = '/dev/ttyUSB1'
-    elif operatingSystem == "W":
+    elif system == "Windows":
         for port in serialPorts:
             if (CLI_SIL_SERIAL_PORT_NAME in port.description):   
                 cliCom = port.device
