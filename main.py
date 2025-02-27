@@ -268,12 +268,12 @@ if __name__=="__main__":
         # print(data)
         if (c.uartCounter % c.framesPerFile == 0):
             if(c.first_file is True): 
-                if(os.path.exists('binData/') == False):
+                if(os.path.exists('TrackingData/') == False):
                     # Note that this will create the folder in the caller's path, not necessarily in the viz folder            
-                    os.mkdir('binData/')
-                os.mkdir('binData/'+c.filepath)
+                    os.mkdir('TrackingData/')
+                os.mkdir('TrackingData/'+c.filepath)
                 c.first_file = False
-            with open('./binData/'+c.filepath+'/replay_' + str(math.floor(c.uartCounter/c.framesPerFile)) + '.json', 'w') as fp:
+            with open('./TrackingData/'+c.filepath+'/replay_' + str(math.floor(c.uartCounter/c.framesPerFile)) + '.json', 'w') as fp:
                 json_object = json.dumps(data, indent=4)
                 fp.write(json_object)
                 c.frames = [] #uncomment to put data into one file at a time in 100 frame chunks
