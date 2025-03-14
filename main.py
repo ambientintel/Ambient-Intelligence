@@ -222,7 +222,7 @@ if __name__=="__main__":
     CLIENT_ID = "fall_detection_device"
     CERT_PATH = "./AWS_IoT/a8f9fb40829e5c654a89bdeffa96037716ca94d299f0c0e8c5428767455110f8-certificate.pem.crt"
     KEY_PATH = "./AWS_IoT/a8f9fb40829e5c654a89bdeffa96037716ca94d299f0c0e8c5428767455110f8-private.pem.key"
-    ROOT_CA_PATH = "rootCA.pem"
+    ROOT_CA_PATH = "./AWS_IoT/rootCA.pem"
 
     try:
         aws_publisher = AWSIoTPublisher(ENDPOINT, CLIENT_ID, CERT_PATH, KEY_PATH, ROOT_CA_PATH)
@@ -239,7 +239,7 @@ if __name__=="__main__":
         print(f"Error setting up AWS IoT: {str(e)}")
         print("Continuing with local printing only")
 
-        
+
     # Optional: Specify a custom save filepath
     SAVE_FILEPATH = "./Data_files"  # Change this to your desired path
     CLI_SIL_SERIAL_PORT_NAME = 'Enhanced COM Port'
