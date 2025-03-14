@@ -173,13 +173,13 @@ class core:
         try:
             self.parser.sendCfg(self.cfg)
             sys.stdout.flush()
-            self.parseTimer.start()  # need this line
+            # self.parseTimer.start(int(self.frameTime))  # need this line
         except Exception as e:
             print(e)
             print("Parsing .cfg file failed. Did you select the right file?")
 
     def gracefulReset(self):
-        self.parseTimer.stop()
+        # self.parseTimer.stop()
         # self.uart_thread.stop()
         if self.parser.cliCom is not None:
             self.parser.cliCom.close()
