@@ -260,7 +260,6 @@ if __name__=="__main__":
 
     serialPorts = list(list_ports.comports())
 
-    c
     print("Welcome to the Fall Detection System.")
     # operatingSystem = input("Enter your operating system: ")
     system = platform.system()
