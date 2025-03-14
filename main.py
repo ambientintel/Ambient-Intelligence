@@ -12,6 +12,7 @@ from contextlib import suppress
 import sys
 import platform
 import AWSIoTPythonSDK.MQTTLib as AWSIoTPyMQTT
+from Pyside2.QtCore import QTimer
 
 class core:
     def __init__(self):
@@ -27,6 +28,7 @@ class core:
         self.uartCounter = 0
         self.first_file = True
         self.fallDetection = FallDetection()
+        self.parseTimer = QTimer
 
         # self.demoClassDict = {
         #     DEMO_OOB_x843: OOBx843(),
@@ -170,13 +172,13 @@ class core:
         try:
             self.parser.sendCfg(self.cfg)
             sys.stdout.flush()
-            # self.parseTimer.start(int(self.frameTime))  # need this line
+            self.parseTimer.start(int(self.frameTime))  # need this line
         except Exception as e:
             print(e)
             print("Parsing .cfg file failed. Did you select the right file?")
 
     def gracefulReset(self):
-        # self.parseTimer.stop()
+        self.parseTimer.stop()
         # self.uart_thread.stop()
         if self.parser.cliCom is not None:
             self.parser.cliCom.close()
