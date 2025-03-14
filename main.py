@@ -12,7 +12,7 @@ from contextlib import suppress
 import sys
 import platform
 import AWSIoTPythonSDK.MQTTLib as AWSIoTPyMQTT
-from Pyside6.QtCore import QTimer
+from PySide6.QtCore import QTimer
 
 class core:
     def __init__(self):
