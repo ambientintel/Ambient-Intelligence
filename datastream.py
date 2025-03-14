@@ -27,6 +27,7 @@ class UARTParser():
         self.filepath = datetime.datetime.now().strftime("%m_%d_%Y_%H_%M_%S")
         self.parserType = type
         self.dataCom = None
+        self.cliCom = None
         self.isLowPowerDevice = False
         self.cfg = ""
         self.demo = ""
