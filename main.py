@@ -365,7 +365,7 @@ if __name__=="__main__":
         
     except KeyboardInterrupt:
         print("Keyboard Interrupt Detected. Stopping program.")
-        c.gracefulReset()
         c.stopSensor()
+        c.gracefulReset()
         
     
