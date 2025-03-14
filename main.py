@@ -295,13 +295,13 @@ if __name__=="__main__":
     c.sendCfg()
 
 
+    try:
+        while True:
+            trial_output = c.parser.readAndParseUartDoubleCOMPort()
+            # print("Read and parse UART")
+            # print(trial_output)
 
-    while True:
-        trial_output = c.parser.readAndParseUartDoubleCOMPort()
-        # print("Read and parse UART")
-        # print(trial_output)
-
-        try:    
+                
             data = {'cfg': c.cfg, 'demo': c.demo, 'device': c.device}
             c.uartCounter += 1
             frameJSON = {}
@@ -363,9 +363,9 @@ if __name__=="__main__":
 
             # print(c.fallDetection.heightBuffer)
         
-        except KeyboardInterrupt:
-            print("Keyboard Interrupt Detected. Stopping program.")
-            c.gracefulReset()
-            c.stopSensor()
-            break
+    except KeyboardInterrupt:
+        print("Keyboard Interrupt Detected. Stopping program.")
+        c.gracefulReset()
+        c.stopSensor()
+        
     
