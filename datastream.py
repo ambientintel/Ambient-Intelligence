@@ -318,3 +318,16 @@ class UARTParser():
         time.sleep(0.03)
         self.cliCom.reset_input_buffer()
         # NOTE - Do NOT close the CLI port because 6432 will use it after configuration  
+
+    def sendLine(self, line):
+        if(self.cliCom.baudrate == 1250000):
+            for char in [*line]:
+                time.sleep(.001) # Character delay. Required for demos which are 1250000 baud by default else characters are skipped
+                self.cliCom.write(char.encode())
+        else:
+            self.cliCom.write(line.encode())
+        ack = self.cliCom.readline()
+        print(ack)
+        ack = self.cliCom.readline()
+        print(ack)
+    
