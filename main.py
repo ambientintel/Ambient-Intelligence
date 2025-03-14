@@ -286,7 +286,7 @@ if __name__=="__main__":
     # dataCom = '/dev/ttyUSB1'
 
     c = core()
-    c.gracefulReset()
+    # c.gracefulReset()
     c.parser.connectComPorts(cliCom, dataCom)
     c.parseCfg("Final_config_6m.cfg")
     c.sendCfg()
@@ -298,65 +298,70 @@ if __name__=="__main__":
         # print("Read and parse UART")
         # print(trial_output)
 
-    
-        data = {'cfg': c.cfg, 'demo': c.demo, 'device': c.device}
-        c.uartCounter += 1
-        frameJSON = {}
-        if ('frameNum' not in trial_output.keys()):
-            print("ERROR: No frame number data in frame")
-            frameJSON['framenumber'] = 0
-        else:
-            frameJSON['frameNumber'] = trial_output['frameNum'] 
+        try:    
+            data = {'cfg': c.cfg, 'demo': c.demo, 'device': c.device}
+            c.uartCounter += 1
+            frameJSON = {}
+            if ('frameNum' not in trial_output.keys()):
+                print("ERROR: No frame number data in frame")
+                frameJSON['framenumber'] = 0
+            else:
+                frameJSON['frameNumber'] = trial_output['frameNum'] 
+            
+            if ('heightData' not in trial_output.keys()):
+                print("ERROR: No height data in frame")
+                frameJSON['HeightData'] = []
+            else:
+                frameJSON['HeightData'] = trial_output['heightData'].tolist()
+
+            frameJSON['timestamp'] = time.time()
+            frameJSON['CurrTime'] = time.ctime(frameJSON['timestamp']) # Add human-readable timestamp
+
+            
+            if ('numDetectedPoints' not in trial_output.keys()):
+                print("ERROR: No points detected in frame")
+                frameJSON['PointsDetected'] = 0
+            else:
+                frameJSON['PointsDetected'] = trial_output['numDetectedPoints']
+
+            if ('heightData' in trial_output):
+                        if (len(trial_output['heightData']) != len(trial_output['trackData'])):
+                            print("WARNING: number of heights does not match number of tracks")
+
+                        # For each height heights for current tracks
+                        for height in trial_output['heightData']:
+                            # Find track with correct TID
+                            for track in trial_output['trackData']:
+                                # Found correct track
+                                if (int(track[0]) == int(height[0])):
+                                    tid = int(height[0])
+                                    height_str = 'tid : ' + str(height[0]) + ', height : ' + str(round(height[1], 2)) + ' m'
+                                    # If this track was computed to have fallen, display it on the screen
+                                    
+                                    fallDetectionDisplayResults = c.fallDetection.step(trial_output['heightData'], trial_output['trackData'])
+                                    if (fallDetectionDisplayResults[tid] > 0): 
+                                        height_str = height_str + " FALL DETECTED"
+                                        print("Alert: Fall Detected for Patient")
+            # frameJSON['fallDetected'] = height_str                                
+            c.frames.append(frameJSON)
+            data['data'] = c.frames
+            # print(data)
+            if (c.uartCounter % c.framesPerFile == 0):
+                if(c.first_file is True): 
+                    if(os.path.exists('TrackingData/') == False):
+                        # Note that this will create the folder in the caller's path, not necessarily in the viz folder            
+                        os.mkdir('TrackingData/')
+                    os.mkdir('TrackingData/'+c.filepath)
+                    c.first_file = False
+                with open('./TrackingData/'+c.filepath+'/replay_' + str(math.floor(c.uartCounter/c.framesPerFile)) + '.json', 'w') as fp:
+                    json_object = json.dumps(data, indent=4)
+                    fp.write(json_object)
+                    c.frames = [] #uncomment to put data into one file at a time in 100 frame chunks
+
+            # print(c.fallDetection.heightBuffer)
         
-        if ('heightData' not in trial_output.keys()):
-            print("ERROR: No height data in frame")
-            frameJSON['HeightData'] = []
-        else:
-            frameJSON['HeightData'] = trial_output['heightData'].tolist()
-
-        frameJSON['timestamp'] = time.time()
-        frameJSON['CurrTime'] = time.ctime(frameJSON['timestamp']) # Add human-readable timestamp
-
-        
-        if ('numDetectedPoints' not in trial_output.keys()):
-            print("ERROR: No points detected in frame")
-            frameJSON['PointsDetected'] = 0
-        else:
-            frameJSON['PointsDetected'] = trial_output['numDetectedPoints']
-
-        if ('heightData' in trial_output):
-                    if (len(trial_output['heightData']) != len(trial_output['trackData'])):
-                        print("WARNING: number of heights does not match number of tracks")
-
-                    # For each height heights for current tracks
-                    for height in trial_output['heightData']:
-                        # Find track with correct TID
-                        for track in trial_output['trackData']:
-                            # Found correct track
-                            if (int(track[0]) == int(height[0])):
-                                tid = int(height[0])
-                                height_str = 'tid : ' + str(height[0]) + ', height : ' + str(round(height[1], 2)) + ' m'
-                                # If this track was computed to have fallen, display it on the screen
-                                
-                                fallDetectionDisplayResults = c.fallDetection.step(trial_output['heightData'], trial_output['trackData'])
-                                if (fallDetectionDisplayResults[tid] > 0): 
-                                    height_str = height_str + " FALL DETECTED"
-                                    print("Alert: Fall Detected for Patient")
-        # frameJSON['fallDetected'] = height_str                                
-        c.frames.append(frameJSON)
-        data['data'] = c.frames
-        # print(data)
-        if (c.uartCounter % c.framesPerFile == 0):
-            if(c.first_file is True): 
-                if(os.path.exists('TrackingData/') == False):
-                    # Note that this will create the folder in the caller's path, not necessarily in the viz folder            
-                    os.mkdir('TrackingData/')
-                os.mkdir('TrackingData/'+c.filepath)
-                c.first_file = False
-            with open('./TrackingData/'+c.filepath+'/replay_' + str(math.floor(c.uartCounter/c.framesPerFile)) + '.json', 'w') as fp:
-                json_object = json.dumps(data, indent=4)
-                fp.write(json_object)
-                c.frames = [] #uncomment to put data into one file at a time in 100 frame chunks
-
-        # print(c.fallDetection.heightBuffer)
+        except KeyboardInterrupt:
+            print("Keyboard Interrupt Detected. Stopping program.")
+            c.gracefulReset()
+            break
     
