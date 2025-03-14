@@ -191,6 +191,9 @@ class core:
         #     if hasattr(demo, "plot_3d"):
         #         demo.removeAllBoundBoxes()
 
+    def stopSensor(self):
+        self.parser.sendLine("sensorStop 0")
+
 class AWSIoTPublisher:
     def __init__(self, endpoint, client_id, cert_path, key_path, root_ca_path):
         self.client = AWSIoTPyMQTT.AWSIoTMQTTClient(client_id)
@@ -363,5 +366,6 @@ if __name__=="__main__":
         except KeyboardInterrupt:
             print("Keyboard Interrupt Detected. Stopping program.")
             c.gracefulReset()
+            c.stopSensor()
             break
     
