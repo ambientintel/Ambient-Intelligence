@@ -11,6 +11,7 @@ from serial.tools import list_ports
 from contextlib import suppress
 import sys
 import platform
+import AWSIoTPythonSDK.MQTTLib as AWSIoTPyMQTT
 
 class core:
     def __init__(self):
@@ -174,8 +175,71 @@ class core:
             print(e)
             print("Parsing .cfg file failed. Did you select the right file?")
 
+class AWSIoTPublisher:
+    def __init__(self, endpoint, client_id, cert_path, key_path, root_ca_path):
+        self.client = AWSIoTPyMQTT.AWSIoTMQTTClient(client_id)
+        self.client.configureEndpoint(endpoint, 8883)
+        self.client.configureCredentials(root_ca_path, key_path, cert_path)
+        
+        # Configure connection parameters
+        self.client.configureAutoReconnectBackoffTime(1, 32, 20)
+        self.client.configureOfflinePublishQueueing(-1)  # Infinite publishing queue
+        self.client.configureDrainingFrequency(2)  # Draining: 2 Hz
+        self.client.configureConnectDisconnectTimeout(10)  # 10 sec
+        self.client.configureMQTTOperationTimeout(5)  # 5 sec
+        
+        # Connect to AWS IoT
+        self.client.connect()
+        print("AWS IoT connected")
+        
+        # Topic to publish messages
+        self.topic = "fall_detection/logs"
+    
+    def publish(self, message):
+        """Publish a message to the AWS IoT topic"""
+        payload = json.dumps({"message": message, "timestamp": time.time()})
+        self.client.publish(self.topic, payload, 0)
+
+# Custom print function that redirects to AWS IoT
+class IoTPrinter:
+    def __init__(self, aws_publisher):
+        self.aws_publisher = aws_publisher
+        self.original_print = print
+    
+    def custom_print(self, *args, **kwargs):
+        # Convert args to a string
+        message = " ".join(map(str, args))
+        
+        # Print to console as usual
+        self.original_print(*args, **kwargs)
+        
+        # Send to AWS IoT
+        self.aws_publisher.publish(message)
 
 if __name__=="__main__":
+
+    ENDPOINT = "d09740292g72j5i9siw7z-ats.iot.us-east-2.amazonaws.com"
+    CLIENT_ID = "fall_detection_device"
+    CERT_PATH = "./AWS_IoT/a8f9fb40829e5c654a89bdeffa96037716ca94d299f0c0e8c5428767455110f8-certificate.pem.crt"
+    KEY_PATH = "./AWS_IoT/a8f9fb40829e5c654a89bdeffa96037716ca94d299f0c0e8c5428767455110f8-private.pem.key"
+    ROOT_CA_PATH = "rootCA.pem"
+
+    try:
+        aws_publisher = AWSIoTPublisher(ENDPOINT, CLIENT_ID, CERT_PATH, KEY_PATH, ROOT_CA_PATH)
+        
+        # Setup custom print function
+        iot_printer = IoTPrinter(aws_publisher)
+        
+        # Replace the built-in print function with our custom one
+        builtins_print = print
+        print = iot_printer.custom_print
+        
+        print("AWS IoT connection established successfully")
+    except Exception as e:
+        print(f"Error setting up AWS IoT: {str(e)}")
+        print("Continuing with local printing only")
+
+        
     # Optional: Specify a custom save filepath
     SAVE_FILEPATH = "./Data_files"  # Change this to your desired path
     CLI_SIL_SERIAL_PORT_NAME = 'Enhanced COM Port'
@@ -183,7 +247,7 @@ if __name__=="__main__":
 
     serialPorts = list(list_ports.comports())
 
-    
+
     print("Welcome to the Fall Detection System.")
     # operatingSystem = input("Enter your operating system: ")
     system = platform.system()
