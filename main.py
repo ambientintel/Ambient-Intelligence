@@ -175,6 +175,19 @@ class core:
             print(e)
             print("Parsing .cfg file failed. Did you select the right file?")
 
+    def gracefulReset(self):
+        self.parseTimer.stop()
+        self.uart_thread.stop()
+        if self.parser.cliCom is not None:
+            self.parser.cliCom.close()
+        if self.parser.dataCom is not None:
+            self.parser.dataCom.close()
+        # for demo in self.demoClassDict.values():
+        #     if hasattr(demo, "plot_3d_thread"):
+        #         demo.plot_3d_thread.stop()
+        #     if hasattr(demo, "plot_3d"):
+        #         demo.removeAllBoundBoxes()
+
 class AWSIoTPublisher:
     def __init__(self, endpoint, client_id, cert_path, key_path, root_ca_path):
         self.client = AWSIoTPyMQTT.AWSIoTMQTTClient(client_id)
@@ -247,7 +260,7 @@ if __name__=="__main__":
 
     serialPorts = list(list_ports.comports())
 
-
+    c
     print("Welcome to the Fall Detection System.")
     # operatingSystem = input("Enter your operating system: ")
     system = platform.system()
@@ -271,6 +284,7 @@ if __name__=="__main__":
     # dataCom = '/dev/ttyUSB1'
 
     c = core()
+    c.gracefulReset()
     c.parser.connectComPorts(cliCom, dataCom)
     c.parseCfg("Final_config_6m.cfg")
     c.sendCfg()
