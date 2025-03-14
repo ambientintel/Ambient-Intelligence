@@ -29,6 +29,7 @@ class core:
         self.first_file = True
         self.fallDetection = FallDetection()
         self.parseTimer = QTimer
+        self.frameTime = 25
 
         # self.demoClassDict = {
         #     DEMO_OOB_x843: OOBx843(),
