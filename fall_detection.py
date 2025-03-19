@@ -1,67 +1,93 @@
 from collections import deque
-import copy 
+import copy
+import numpy as np
 
 class FallDetection:
-
-    # Initialize the class with the default parameters (tested empirically)
-    def __init__(self, maxNumTracks = 30, frameTime = 55, fallingThresholdProportion = 0.6, secondsInFallBuffer = 2.5):
+    def __init__(self, maxNumTracks=30, frameTime=55, fallingThresholdProportion=0.6, secondsInFallBuffer=2.5):
         self.fallingThresholdProportion = fallingThresholdProportion
         self.secondsInFallBuffer = secondsInFallBuffer
         self.heightHistoryLen = int(round(self.secondsInFallBuffer * frameTime))
-        self.heightBuffer = [deque([-5] *  self.heightHistoryLen, maxlen =  self.heightHistoryLen) for i in range(maxNumTracks)]
+        self.heightBuffer = {}  # Use a dictionary instead of a list to handle any track ID
+        self.velocityBuffer = {}  # Track vertical velocity
         self.tracksIDsInPreviousFrame = []
-        self.fallBufferDisplay = [0 for i in range(maxNumTracks)] # Fall results that will be displayed to screen
-        self.numFramesToDisplayFall = 100 # How many frames do you want to display a fall on the screen for
-
-    # Sensitivity as given by the FallDetectionSliderClass instance
+        self.fallBufferDisplay = {}  # Fall results that will be displayed to screen
+        self.numFramesToDisplayFall = 100
+        self.minTrackHistory = 10  # Minimum number of frames to track before detecting falls
+        self.heightThreshold = 0.5  # Absolute height threshold in meters
+        self.velocityThreshold = -0.5  # Velocity threshold in meters/second
+        self.frameTime = frameTime / 1000.0  # Convert to seconds
+        
     def setFallSensitivity(self, fallingThresholdProportion):
         self.fallingThresholdProportion = fallingThresholdProportion
 
-    # Update the fall detection results for every track in the frame
     def step(self, heights, tracks):
-        # Decrement results for fall detection display
-        for idx, result in enumerate(self.fallBufferDisplay):
-            self.fallBufferDisplay[idx] = max(self.fallBufferDisplay[idx] - 1, 0)
-
+        # Decrement fall display counters
+        for tid in list(self.fallBufferDisplay.keys()):
+            self.fallBufferDisplay[tid] = max(self.fallBufferDisplay[tid] - 1, 0)
+            
         trackIDsInCurrFrame = []
-        # Populate heights for current tracks
+        
+        # Process current tracks
         for height in heights:
-            # Find track with correct TID
-            for track in tracks:
-                # Found correct track
-                if (int(track[0]) == int(height[0])):
-                    tid = int(height[0])
-                    self.heightBuffer[tid].appendleft(height[1])
-                    trackIDsInCurrFrame.append(tid)
-                    
-                    # Check if fallen
-                    if(self.heightBuffer[tid][0] < self.fallingThresholdProportion * self.heightBuffer[tid][-1]):
-                        self.fallBufferDisplay[tid] = self.numFramesToDisplayFall
-
-
-        # Reset the buffer for tracks that were detected in the previous frame but not the current frame
-        tracksToReset = set(self.tracksIDsInPreviousFrame) - set(trackIDsInCurrFrame) 
-        for track in tracksToReset:
-            for frame in range(self.heightHistoryLen):
-                self.heightBuffer[track].appendleft(-5) # Fill the buffer with -5's to remove any history for the track
+            tid = int(height[0])
+            current_height = height[1]
+            
+            # Initialize buffer for new tracks
+            if tid not in self.heightBuffer:
+                self.heightBuffer[tid] = deque([current_height] * self.heightHistoryLen, 
+                                             maxlen=self.heightHistoryLen)
+                self.velocityBuffer[tid] = deque([0] * self.heightHistoryLen, 
+                                               maxlen=self.heightHistoryLen)
+                self.fallBufferDisplay[tid] = 0
+            
+            # Calculate velocity (change in height / time)
+            prev_height = self.heightBuffer[tid][0]
+            velocity = (current_height - prev_height) / self.frameTime
+            
+            # Update buffers
+            self.heightBuffer[tid].appendleft(current_height)
+            self.velocityBuffer[tid].appendleft(velocity)
+            trackIDsInCurrFrame.append(tid)
+            
+            # Only analyze tracks with sufficient history
+            if len(trackIDsInCurrFrame) >= self.minTrackHistory:
+                # Get recent height and velocity patterns
+                recent_heights = list(self.heightBuffer[tid])[:10]  # Last 10 frames
+                recent_velocities = list(self.velocityBuffer[tid])[:10]  # Last 10 frames
+                
+                # Calculate statistics
+                max_height = max(recent_heights)
+                min_height = min(recent_heights)
+                height_drop = max_height - min_height
+                avg_velocity = sum(recent_velocities) / len(recent_velocities)
+                min_velocity = min(recent_velocities)
+                
+                # Multi-factor fall detection
+                is_falling = (
+                    # Significant height drop relative to maximum height
+                    height_drop > self.fallingThresholdProportion * max_height and
+                    # Current height is below threshold
+                    current_height < self.heightThreshold and
+                    # Velocity indicates rapid downward movement
+                    min_velocity < self.velocityThreshold
+                )
+                
+                if is_falling:
+                    self.fallBufferDisplay[tid] = self.numFramesToDisplayFall
+        
+        # Handle tracks that disappeared
+        tracksToReset = set(self.tracksIDsInPreviousFrame) - set(trackIDsInCurrFrame)
+        for tid in tracksToReset:
+            if tid in self.heightBuffer:
+                self.heightBuffer[tid].clear()
+                self.velocityBuffer[tid].clear()
+        
         self.tracksIDsInPreviousFrame = copy.deepcopy(trackIDsInCurrFrame)
         
-        return self.fallBufferDisplay
-        
-    # def sendFallAlert(self):
-
-
-# TODO This stuff was never used in original implementation?
-#     def resetFallText(self):
-#         self.fallAlert.setText('Standing')
-#         self.fallPic.setPixmap(self.standingPicture)
-#         self.fallResetTimerOn = 0
-
-
-#     def updateFallThresh(self):
-#         try:
-#             newThresh = float(self.fallThreshInput.text())
-#             self.fallThresh = newThresh
-#             self.fallThreshMarker.setPos(self.fallThresh)
-#         except:
-#             print('No numerical threshold')
+        # Return results in the expected format (list indexed by track ID)
+        result = [0] * max(list(self.fallBufferDisplay.keys()) + [0]) + [1]
+        for tid, value in self.fallBufferDisplay.items():
+            if tid < len(result):
+                result[tid] = value
+                
+        return result
