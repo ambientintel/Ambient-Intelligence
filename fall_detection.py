@@ -3,7 +3,7 @@ import copy
 import numpy as np
 
 class FallDetection:
-    def __init__(self, maxNumTracks=30, frameTime=55, fallingThresholdProportion=0.6, secondsInFallBuffer=2.5):
+    def __init__(self, maxNumTracks=30, frameTime=55, fallingThresholdProportion=0.9, secondsInFallBuffer=2.5):
         self.fallingThresholdProportion = fallingThresholdProportion
         self.secondsInFallBuffer = secondsInFallBuffer
         self.heightHistoryLen = int(round(self.secondsInFallBuffer * frameTime))
