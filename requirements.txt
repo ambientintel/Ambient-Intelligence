@@ -2,3 +2,4 @@ serial
 numpy
 matplotlib
 json_fix
+AWSIoTPythonSDK
