@@ -175,6 +175,24 @@ git pull origin main
 ```
 ---
 
+### Create a Virtual Environment
+
+It's recommended to create a virtual environment to isolate the package dependencies from your global Python installation. Navigate to the directory where you have cloned the package and run the below commands.
+
+#### On Linux
+```bash
+python3 -m venv venv
+source venv/bin/activate
+```
+
+#### On Windows:
+```bash
+python -m venv venv
+venv\Scripts\activate
+```
+
+Once activated, your command prompt should show the name of the virtual environment, indicating it's active.
+
 ### Install Dependencies
 
 Install the required Python dependencies using `pip`:
