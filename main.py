@@ -11,22 +11,25 @@ from serial.tools import list_ports
 from contextlib import suppress
 import sys
 import platform
-import AWSIoTPythonSDK.MQTTLib as AWSIoTPyMQTT
 import serial
+import AWSIoTPythonSDK.MQTTLib as AWSIoTPyMQTT
 
-def reset_iwr6843aop(cli_port, data_port=None):
+def power_cycle_iwr6843aop(cli_port, data_port=None):
     """
-    Soft reset an IWR6843AOP mmWave sensor
+    Simulate a power cycle for an IWR6843AOP mmWave sensor by doing a
+    hard reset through disconnection and reconnection of serial ports
     
     Parameters:
     cli_port (str): Serial port for command line interface
     data_port (str, optional): Data port if using separate ports for commands and data
     
     Returns:
-    bool: True if reset successful, False otherwise
+    bool: True if power cycle successful, False otherwise
     """
     try:
-        # Open connection to CLI port
+        print(f"Attempting to power cycle sensor on {cli_port}")
+        
+        # Step 1: Open connection to CLI port
         cli_serial = serial.Serial(
             port=cli_port,
             baudrate=115200,  # Default baud rate for IWR6843 CLI
@@ -36,9 +39,8 @@ def reset_iwr6843aop(cli_port, data_port=None):
             timeout=1
         )
         
-        print(f"Connected to {cli_port} for reset")
-        
-        # If data port specified, open that connection too
+        # Step 2: If data port specified, open that connection too
+        data_serial = None
         if data_port:
             data_serial = serial.Serial(
                 port=data_port,
@@ -48,38 +50,95 @@ def reset_iwr6843aop(cli_port, data_port=None):
                 stopbits=serial.STOPBITS_ONE,
                 timeout=1
             )
-            print(f"Connected to data port {data_port} for reset")
+            print(f"Connected to data port {data_port}")
         
-        # Send stop command
-        stop_cmd = "sensorStop\n"
-        cli_serial.write(stop_cmd.encode())
-        time.sleep(0.5)
+        # Step 3: First try a sensorStop command to halt any active sensing
+        try:
+            print("Stopping sensor...")
+            stop_cmd = "sensorStop\n"
+            cli_serial.write(stop_cmd.encode())
+            time.sleep(0.5)
+            response = cli_serial.read(cli_serial.in_waiting).decode('utf-8', errors='ignore')
+            print(f"Stop response: {response}")
+        except Exception as e:
+            print(f"Error stopping sensor: {e}")
         
-        # Read response
-        response = cli_serial.read(cli_serial.in_waiting).decode('utf-8')
-        print(f"Stop response: {response}")
+        # Step 4: Try a systemReset command
+        try:
+            print("Sending system reset command...")
+            reset_cmd = "systemReset\n"
+            cli_serial.write(reset_cmd.encode())
+            time.sleep(0.5)
+        except Exception as e:
+            print(f"Error sending reset command: {e}")
         
-        # Send reset command
-        reset_cmd = "systemReset\n"
-        cli_serial.write(reset_cmd.encode())
-        time.sleep(2)  # Give the sensor time to reset
+        # Step 5: Close all connections to simulate power down
+        print("Closing all serial connections to simulate power down...")
+        if cli_serial and cli_serial.is_open:
+            cli_serial.close()
         
-        # Read response (may not get one due to reset)
-        response = cli_serial.read(cli_serial.in_waiting).decode('utf-8')
-        print(f"Reset response: {response}")
+        if data_serial and data_serial.is_open:
+            data_serial.close()
         
-        print("Sensor reset successfully")
+        # Step 6: Wait longer to simulate power off
+        print("Waiting to simulate complete power cycle...")
+        time.sleep(3)
         
-        # Close connections
-        cli_serial.close()
+        # Step 7: Reopen connections to simulate power up
+        print("Reopening connections to simulate power up...")
+        cli_serial = serial.Serial(
+            port=cli_port,
+            baudrate=115200,
+            bytesize=serial.EIGHTBITS,
+            parity=serial.PARITY_NONE,
+            stopbits=serial.STOPBITS_ONE,
+            timeout=1
+        )
+        
         if data_port:
+            data_serial = serial.Serial(
+                port=data_port,
+                baudrate=921600,
+                bytesize=serial.EIGHTBITS,
+                parity=serial.PARITY_NONE,
+                stopbits=serial.STOPBITS_ONE,
+                timeout=1
+            )
+        
+        # Step 8: Send a ping command to verify connection
+        print("Testing connection...")
+        ping_cmd = "version\n"
+        cli_serial.write(ping_cmd.encode())
+        time.sleep(1)
+        
+        try:
+            response = cli_serial.read(cli_serial.in_waiting).decode('utf-8', errors='ignore')
+            print(f"Response after power cycle: {response}")
+            if "Version" in response or "version" in response:
+                print("Connection verified - power cycle successful")
+                success = True
+            else:
+                print("Connection response unclear, but ports reopened")
+                success = True
+        except Exception as e:
+            print(f"Error reading response: {e}")
+            success = False
+        
+        # Step 9: Close connections again for clean state
+        if cli_serial and cli_serial.is_open:
+            cli_serial.close()
+        
+        if data_serial and data_serial.is_open:
             data_serial.close()
             
     except serial.SerialException as e:
-        print(f"Error during sensor reset: {e}")
+        print(f"Error during power cycle: {e}")
+        return False
+    except Exception as e:
+        print(f"Unexpected error during power cycle: {e}")
         return False
     
-    return True
+    return success
 
 class core:
     def __init__(self):
@@ -294,20 +353,20 @@ if __name__=="__main__":
     KEY_PATH = "./AWS_IoT/a8f9fb40829e5c654a89bdeffa96037716ca94d299f0c0e8c5428767455110f8-private.pem.key"
     ROOT_CA_PATH = "./AWS_IoT/rootCA.pem"
 
-    # try:
-    #     aws_publisher = AWSIoTPublisher(ENDPOINT, CLIENT_ID, CERT_PATH, KEY_PATH, ROOT_CA_PATH)
+    try:
+        aws_publisher = AWSIoTPublisher(ENDPOINT, CLIENT_ID, CERT_PATH, KEY_PATH, ROOT_CA_PATH)
         
-    #     # Setup custom print function
-    #     iot_printer = IoTPrinter(aws_publisher)
+        # Setup custom print function
+        iot_printer = IoTPrinter(aws_publisher)
         
-    #     # Replace the built-in print function with our custom one
-    #     builtins_print = print
-    #     print = iot_printer.custom_print
+        # Replace the built-in print function with our custom one
+        builtins_print = print
+        print = iot_printer.custom_print
         
-    #     print("AWS IoT connection established successfully")
-    # except Exception as e:
-    #     print(f"Error setting up AWS IoT: {str(e)}")
-    #     print("Continuing with local printing only")
+        print("AWS IoT connection established successfully")
+    except Exception as e:
+        print(f"Error setting up AWS IoT: {str(e)}")
+        print("Continuing with local printing only")
 
 
     # Optional: Specify a custom save filepath
@@ -334,18 +393,20 @@ if __name__=="__main__":
             cliCom = input("CLI COM port not found for devices. Please enter the CLI COM port: ")
             dataCom = input("DATA COM port not found for devices. Please enter the DATA COM port: ")
 
+    # Perform a power cycle on the sensor before starting
+    print("Performing sensor power cycle before starting...")
+    reset_success = power_cycle_iwr6843aop(cliCom, dataCom)
+    if reset_success:
+        print("Sensor power cycled successfully. Proceeding with initialization.")
+    else:
+        print("WARNING: Sensor power cycle failed. Attempting to continue anyway.")
+        time.sleep(3)  # Give some time before proceeding
 
-
-    #for linux
-    # cliCom = '/dev/ttyUSB0'
-    # dataCom = '/dev/ttyUSB1'
 
     c = core()
     c.parser.connectComPorts(cliCom, dataCom)
     c.parseCfg("Final_config_6m.cfg")
     c.sendCfg()
-
-
 
     # Add keyboard exception handling for graceful exit and reset
     try:
@@ -416,11 +477,11 @@ if __name__=="__main__":
 
             # print(c.fallDetection.heightBuffer)
     except KeyboardInterrupt:
-        print("\nProgram interrupted by user. Performing sensor reset before exit...")
-        reset_iwr6843aop(cliCom, dataCom)
+        print("\nProgram interrupted by user. Performing sensor power cycle before exit...")
+        power_cycle_iwr6843aop(cliCom, dataCom)
         print("Exiting program.")
     except Exception as e:
         print(f"Error in main loop: {str(e)}")
-        print("Performing sensor reset before exit...")
-        reset_iwr6843aop(cliCom, dataCom)
+        print("Performing sensor power cycle before exit...")
+        power_cycle_iwr6843aop(cliCom, dataCom)
         print("Exiting program due to error.")
