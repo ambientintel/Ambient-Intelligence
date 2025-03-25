@@ -12,6 +12,74 @@ from contextlib import suppress
 import sys
 import platform
 import AWSIoTPythonSDK.MQTTLib as AWSIoTPyMQTT
+import serial
+
+def reset_iwr6843aop(cli_port, data_port=None):
+    """
+    Soft reset an IWR6843AOP mmWave sensor
+    
+    Parameters:
+    cli_port (str): Serial port for command line interface
+    data_port (str, optional): Data port if using separate ports for commands and data
+    
+    Returns:
+    bool: True if reset successful, False otherwise
+    """
+    try:
+        # Open connection to CLI port
+        cli_serial = serial.Serial(
+            port=cli_port,
+            baudrate=115200,  # Default baud rate for IWR6843 CLI
+            bytesize=serial.EIGHTBITS,
+            parity=serial.PARITY_NONE,
+            stopbits=serial.STOPBITS_ONE,
+            timeout=1
+        )
+        
+        print(f"Connected to {cli_port} for reset")
+        
+        # If data port specified, open that connection too
+        if data_port:
+            data_serial = serial.Serial(
+                port=data_port,
+                baudrate=921600,  # Default baud rate for IWR6843 data port
+                bytesize=serial.EIGHTBITS,
+                parity=serial.PARITY_NONE,
+                stopbits=serial.STOPBITS_ONE,
+                timeout=1
+            )
+            print(f"Connected to data port {data_port} for reset")
+        
+        # Send stop command
+        stop_cmd = "sensorStop\n"
+        cli_serial.write(stop_cmd.encode())
+        time.sleep(0.5)
+        
+        # Read response
+        response = cli_serial.read(cli_serial.in_waiting).decode('utf-8')
+        print(f"Stop response: {response}")
+        
+        # Send reset command
+        reset_cmd = "systemReset\n"
+        cli_serial.write(reset_cmd.encode())
+        time.sleep(2)  # Give the sensor time to reset
+        
+        # Read response (may not get one due to reset)
+        response = cli_serial.read(cli_serial.in_waiting).decode('utf-8')
+        print(f"Reset response: {response}")
+        
+        print("Sensor reset successfully")
+        
+        # Close connections
+        cli_serial.close()
+        if data_port:
+            data_serial.close()
+            
+    except serial.SerialException as e:
+        print(f"Error during sensor reset: {e}")
+        return False
+    
+    return True
 
 class core:
     def __init__(self):
@@ -175,6 +243,8 @@ class core:
             print(e)
             print("Parsing .cfg file failed. Did you select the right file?")
 
+    
+
 class AWSIoTPublisher:
     def __init__(self, endpoint, client_id, cert_path, key_path, root_ca_path):
         self.client = AWSIoTPyMQTT.AWSIoTMQTTClient(client_id)
@@ -277,70 +347,80 @@ if __name__=="__main__":
 
 
 
-    while True:
-        trial_output = c.parser.readAndParseUartDoubleCOMPort()
-        # print("Read and parse UART")
-        # print(trial_output)
-
-    
-        data = {'cfg': c.cfg, 'demo': c.demo, 'device': c.device}
-        c.uartCounter += 1
-        frameJSON = {}
-        if ('frameNum' not in trial_output.keys()):
-            print("ERROR: No frame number data in frame")
-            frameJSON['framenumber'] = 0
-        else:
-            frameJSON['frameNumber'] = trial_output['frameNum'] 
-        
-        if ('heightData' not in trial_output.keys()):
-            print("ERROR: No height data in frame")
-            frameJSON['HeightData'] = []
-        else:
-            frameJSON['HeightData'] = trial_output['heightData'].tolist()
-
-        frameJSON['timestamp'] = time.time()
-        frameJSON['CurrTime'] = time.ctime(frameJSON['timestamp']) # Add human-readable timestamp
+    # Add keyboard exception handling for graceful exit and reset
+    try:
+        while True:
+            trial_output = c.parser.readAndParseUartDoubleCOMPort()
+            # print("Read and parse UART")
+            # print(trial_output)
 
         
-        if ('numDetectedPoints' not in trial_output.keys()):
-            print("ERROR: No points detected in frame")
-            frameJSON['PointsDetected'] = 0
-        else:
-            frameJSON['PointsDetected'] = trial_output['numDetectedPoints']
+            data = {'cfg': c.cfg, 'demo': c.demo, 'device': c.device}
+            c.uartCounter += 1
+            frameJSON = {}
+            if ('frameNum' not in trial_output.keys()):
+                print("ERROR: No frame number data in frame")
+                frameJSON['framenumber'] = 0
+            else:
+                frameJSON['frameNumber'] = trial_output['frameNum'] 
+            
+            if ('heightData' not in trial_output.keys()):
+                print("ERROR: No height data in frame")
+                frameJSON['HeightData'] = []
+            else:
+                frameJSON['HeightData'] = trial_output['heightData'].tolist()
 
-        if ('heightData' in trial_output):
-                    if (len(trial_output['heightData']) != len(trial_output['trackData'])):
-                        print("WARNING: number of heights does not match number of tracks")
+            frameJSON['timestamp'] = time.time()
+            frameJSON['CurrTime'] = time.ctime(frameJSON['timestamp']) # Add human-readable timestamp
 
-                    # For each height heights for current tracks
-                    for height in trial_output['heightData']:
-                        # Find track with correct TID
-                        for track in trial_output['trackData']:
-                            # Found correct track
-                            if (int(track[0]) == int(height[0])):
-                                tid = int(height[0])
-                                height_str = 'tid : ' + str(height[0]) + ', height : ' + str(round(height[1], 2)) + ' m'
-                                # If this track was computed to have fallen, display it on the screen
-                                
-                                fallDetectionDisplayResults = c.fallDetection.step(trial_output['heightData'], trial_output['trackData'])
-                                if (fallDetectionDisplayResults[tid] > 0): 
-                                    height_str = height_str + " FALL DETECTED"
-                                    print("Alert: Fall Detected for Patient")
-        # frameJSON['fallDetected'] = height_str                                
-        c.frames.append(frameJSON)
-        data['data'] = c.frames
-        # print(data)
-        if (c.uartCounter % c.framesPerFile == 0):
-            if(c.first_file is True): 
-                if(os.path.exists('TrackingData/') == False):
-                    # Note that this will create the folder in the caller's path, not necessarily in the viz folder            
-                    os.mkdir('TrackingData/')
-                os.mkdir('TrackingData/'+c.filepath)
-                c.first_file = False
-            with open('./TrackingData/'+c.filepath+'/replay_' + str(math.floor(c.uartCounter/c.framesPerFile)) + '.json', 'w') as fp:
-                json_object = json.dumps(data, indent=4)
-                fp.write(json_object)
-                c.frames = [] #uncomment to put data into one file at a time in 100 frame chunks
+            
+            if ('numDetectedPoints' not in trial_output.keys()):
+                print("ERROR: No points detected in frame")
+                frameJSON['PointsDetected'] = 0
+            else:
+                frameJSON['PointsDetected'] = trial_output['numDetectedPoints']
 
-        # print(c.fallDetection.heightBuffer)
-    
+            if ('heightData' in trial_output):
+                        if (len(trial_output['heightData']) != len(trial_output['trackData'])):
+                            print("WARNING: number of heights does not match number of tracks")
+
+                        # For each height heights for current tracks
+                        for height in trial_output['heightData']:
+                            # Find track with correct TID
+                            for track in trial_output['trackData']:
+                                # Found correct track
+                                if (int(track[0]) == int(height[0])):
+                                    tid = int(height[0])
+                                    height_str = 'tid : ' + str(height[0]) + ', height : ' + str(round(height[1], 2)) + ' m'
+                                    # If this track was computed to have fallen, display it on the screen
+                                    
+                                    fallDetectionDisplayResults = c.fallDetection.step(trial_output['heightData'], trial_output['trackData'])
+                                    if (fallDetectionDisplayResults[tid] > 0): 
+                                        height_str = height_str + " FALL DETECTED"
+                                        print("Alert: Fall Detected for Patient")
+            # frameJSON['fallDetected'] = height_str                                
+            c.frames.append(frameJSON)
+            data['data'] = c.frames
+            # print(data)
+            if (c.uartCounter % c.framesPerFile == 0):
+                if(c.first_file is True): 
+                    if(os.path.exists('TrackingData/') == False):
+                        # Note that this will create the folder in the caller's path, not necessarily in the viz folder            
+                        os.mkdir('TrackingData/')
+                    os.mkdir('TrackingData/'+c.filepath)
+                    c.first_file = False
+                with open('./TrackingData/'+c.filepath+'/replay_' + str(math.floor(c.uartCounter/c.framesPerFile)) + '.json', 'w') as fp:
+                    json_object = json.dumps(data, indent=4)
+                    fp.write(json_object)
+                    c.frames = [] #uncomment to put data into one file at a time in 100 frame chunks
+
+            # print(c.fallDetection.heightBuffer)
+    except KeyboardInterrupt:
+        print("\nProgram interrupted by user. Performing sensor reset before exit...")
+        reset_iwr6843aop(cliCom, dataCom)
+        print("Exiting program.")
+    except Exception as e:
+        print(f"Error in main loop: {str(e)}")
+        print("Performing sensor reset before exit...")
+        reset_iwr6843aop(cliCom, dataCom)
+        print("Exiting program due to error.")
