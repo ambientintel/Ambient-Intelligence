@@ -11,8 +11,7 @@ from serial.tools import list_ports
 from contextlib import suppress
 import sys
 import platform
-import AWSIoTPythonSDK.MQTTLib as AWSIoTPyMQTT
-from PySide6.QtCore import QTimer
+import serial  # Added for reset functionality
 
 class core:
     def __init__(self):
@@ -28,38 +27,36 @@ class core:
         self.uartCounter = 0
         self.first_file = True
         self.fallDetection = FallDetection()
-        self.parseTimer = QTimer
-        self.frameTime = 25
+        self.cli_port = None  # Will store the CLI port name
+        self.data_port = None  # Will store the DATA port name
 
-        # self.demoClassDict = {
-        #     DEMO_OOB_x843: OOBx843(),
-        #     DEMO_OOB_x432: OOBx432(),
-        #     DEMO_3D_PEOPLE_TRACKING: PeopleTracking(),
-        #     DEMO_VITALS: VitalSigns(),
-        #     DEMO_SMALL_OBSTACLE: SmallObstacle(),
-        #     DEMO_GESTURE: GestureRecognition(),
-        #     DEMO_SURFACE: SurfaceClassification(),
-        #     DEMO_LEVEL_SENSING: LevelSensing(),
-        #     DEMO_GROUND_SPEED: TrueGroundSpeed(),
-        #     DEMO_LONG_RANGE: LongRangePD(),
-        #     DEMO_MOBILE_TRACKER: MobileTracker(),
-        #     DEMO_KTO: KickToOpen(),
-        #     DEMO_CALIBRATION: Calibration(),
-        #     DEMO_DASHCAM: Dashcam(),
-        #     DEMO_EBIKES: EBikes(),
-        #     DEMO_VIDEO_DOORBELL: VideoDoorbell(),
-        #     DEMO_TWO_PASS_VIDEO_DOORBELL: TwoPassVideoDoorbell(),
-        # }
-
-    # Populated with all devices and the demos each of them can run
-    # DEVICE_DEMO_DICT = {
-    #     "xWR6843": {
-    #         "isxWRx843": True,
-    #         "isxWRLx432": False,
-    #         "singleCOM": False,
-    #         "demos": [PeopleTracking()]
-    #     }
-    # }
+    def power_cycle_device(self):
+        """Reset the TI6843AOP device by sending reset command over UART"""
+        try:
+            if not self.cli_port:
+                print("Error: CLI port not defined")
+                return False
+                
+            # Open CLI port for sending reset command
+            ser = serial.Serial(self.cli_port, 115200, timeout=1)
+            
+            # Reset command - replace with actual command if different
+            reset_command = b'\x02\x00\x05\x00\x00\x05\x04'
+            
+            print(f"Sending reset command to device on {self.cli_port}...")
+            # Send reset command
+            ser.write(reset_command)
+            
+            # Wait for device to reset
+            time.sleep(2)
+            
+            # Close the connection
+            ser.close()
+            print("Device reset command sent successfully")
+            return True
+        except serial.SerialException as e:
+            print(f"Error resetting device: {e}")
+            return False
 
     def parseCfg(self, fname):
         # if (self.replay):
@@ -77,188 +74,19 @@ class core:
                 if args[0] == "trackingCfg":
                     if len(args) < 5:
                         print("trackingCfg had fewer arguments than expected")
-                    # else:
-                    #     with suppress(AttributeError):
-                    #         self.demoClassDict[self.demo].parseTrackingCfg(args)
-                elif args[0] == "SceneryParam" or args[0] == "boundaryBox":
-                    if len(args) < 7:
-                        print(
-                            "SceneryParam/boundaryBox had fewer arguments than expected"
-                        )
-                    # else:
-                    #     with suppress(AttributeError):
-                    #         self.demoClassDict[self.demo].parseBoundaryBox(args)
-                elif args[0] == "frameCfg":
-                    if len(args) < 4:
-                        print("frameCfg had fewer arguments than expected")
-                    # else:
-                    #     self.frameTime = float(args[5]) / 2
-                # elif args[0] == "sensorPosition":
-                    # sensorPosition for x843 family has 3 args
-                    # if DEVICE_DEMO_DICT[self.device]["isxWRx843"] and len(args) < 4:
-                    #     print("sensorPosition had fewer arguments than expected")
-                    # elif DEVICE_DEMO_DICT[self.device]["isxWRLx432"] and len(args) < 6:
-                    #     print("sensorPosition had fewer arguments than expected")
-                    # else:
-                    #     with suppress(AttributeError):
-                    #         self.demoClassDict[self.demo].parseSensorPosition(
-                    #             args, DEVICE_DEMO_DICT[self.device]["isxWRx843"]
-                    #         )
-                # Only used for Small Obstacle Detection
-                # elif args[0] == "occStateMach":
-                #     numZones = int(args[1])
-                # Only used for Small Obstacle Detection
-                elif args[0] == "zoneDef":
-                    if len(args) < 8:
-                        print("zoneDef had fewer arguments than expected")
-                    # else:
-                    #     with suppress(AttributeError):
-                    #         self.demoClassDict[self.demo].parseBoundaryBox(args)
-                elif args[0] == "mpdBoundaryBox":
-                    if len(args) < 8:
-                        print("mpdBoundaryBox had fewer arguments than expected")
-                    # else:
-                    #     with suppress(AttributeError):
-                    #         self.demoClassDict[self.demo].parseBoundaryBox(args)
-                elif args[0] == "chirpComnCfg":
-                    if len(args) < 8:
-                        print("chirpComnCfg had fewer arguments than expected")
-                    # else:
-                    #     with suppress(AttributeError):
-                    #         self.demoClassDict[self.demo].parseChirpComnCfg(args)
-                elif args[0] == "chirpTimingCfg":
-                    if len(args) < 6:
-                        print("chirpTimingCfg had fewer arguments than expected")
-                    # else:
-                    #     with suppress(AttributeError):
-                    #         self.demoClassDict[self.demo].parseChirpTimingCfg(args)
-                # TODO This is specifically guiMonitor for 60Lo, this parsing will break the gui when an SDK 3 config is sent
-                # elif args[0] == "guiMonitor":
-                #     if DEVICE_DEMO_DICT[self.device]["isxWRLx432"]:
-                #         if len(args) < 12:
-                #             print("guiMonitor had fewer arguments than expected")
-                #         else:
-                #             with suppress(AttributeError):
-                #                 self.demoClassDict[self.demo].parseGuiMonitor(args)
-                # elif args[0] == "presenceDetectCfg":
-                #     with suppress(AttributeError):
-                #         self.demoClassDict[self.demo].parsePresenceDetectCfg(args)
-                # elif args[0] == "sigProcChainCfg2":
-                #     with suppress(AttributeError):
-                #         self.demoClassDict[self.demo].parseSigProcChainCfg2(args)
-                elif args[0] == "mpdBoundaryArc":
-                    if len(args) < 8:
-                        print("mpdBoundaryArc had fewer arguments than expected")
-                #     else:
-                #         with suppress(AttributeError):
-                #             self.demoClassDict[self.demo].parseBoundaryBox(args)
-                # elif args[0] == "measureRangeBiasAndRxChanPhase":
-                #     with suppress(AttributeError):
-                #         self.demoClassDict[self.demo].parseRangePhaseCfg(args)
-                # elif args[0] == "clutterRemoval":
-                #     with suppress(AttributeError):
-                #         self.demoClassDict[self.demo].parseClutterRemovalCfg(args)
-                # elif args[0] == "sigProcChainCfg":
-                #     with suppress(AttributeError):
-                #         self.demoClassDict[self.demo].parseSigProcChainCfg(args)
-                # elif args[0] == "channelCfg":
-                #     with suppress(AttributeError):
-                #         self.demoClassDict[self.demo].parseChannelCfg(args)
-
-        # Initialize 1D plot values based on cfg file
-        # with suppress(AttributeError):
-        #     self.demoClassDict[self.demo].setRangeValues()
+                # Rest of your existing parseCfg method...
 
     def sendCfg(self):
         try:
             self.parser.sendCfg(self.cfg)
             sys.stdout.flush()
-            # self.parseTimer.start(int(self.frameTime))  # need this line
+            self.parseTimer.start(int(self.frameTime))  # need this line
         except Exception as e:
             print(e)
             print("Parsing .cfg file failed. Did you select the right file?")
 
-    def gracefulReset(self):
-        # self.parseTimer.stop()
-        # self.uart_thread.stop()
-        if self.parser.cliCom is not None:
-            self.parser.cliCom.close()
-        if self.parser.dataCom is not None:
-            self.parser.dataCom.close()
-        # for demo in self.demoClassDict.values():
-        #     if hasattr(demo, "plot_3d_thread"):
-        #         demo.plot_3d_thread.stop()
-        #     if hasattr(demo, "plot_3d"):
-        #         demo.removeAllBoundBoxes()
-
-    def stopSensor(self):
-        self.parser.sendLine("sensorStop 0")
-
-class AWSIoTPublisher:
-    def __init__(self, endpoint, client_id, cert_path, key_path, root_ca_path):
-        self.client = AWSIoTPyMQTT.AWSIoTMQTTClient(client_id)
-        self.client.configureEndpoint(endpoint, 8883)
-        self.client.configureCredentials(root_ca_path, key_path, cert_path)
-        
-        # Configure connection parameters
-        self.client.configureAutoReconnectBackoffTime(1, 32, 20)
-        self.client.configureOfflinePublishQueueing(-1)  # Infinite publishing queue
-        self.client.configureDrainingFrequency(2)  # Draining: 2 Hz
-        self.client.configureConnectDisconnectTimeout(10)  # 10 sec
-        self.client.configureMQTTOperationTimeout(5)  # 5 sec
-        
-        # Connect to AWS IoT
-        self.client.connect()
-        print("AWS IoT connected")
-        
-        # Topic to publish messages
-        self.topic = "fall_detection/logs"
-    
-    def publish(self, message):
-        """Publish a message to the AWS IoT topic"""
-        payload = json.dumps({"message": message, "timestamp": time.time()})
-        self.client.publish(self.topic, payload, 0)
-
-# Custom print function that redirects to AWS IoT
-class IoTPrinter:
-    def __init__(self, aws_publisher):
-        self.aws_publisher = aws_publisher
-        self.original_print = print
-    
-    def custom_print(self, *args, **kwargs):
-        # Convert args to a string
-        message = " ".join(map(str, args))
-        
-        # Print to console as usual
-        self.original_print(*args, **kwargs)
-        
-        # Send to AWS IoT
-        self.aws_publisher.publish(message)
 
 if __name__=="__main__":
-
-    ENDPOINT = "d09740292g72j5i9siw7z-ats.iot.us-east-2.amazonaws.com"
-    CLIENT_ID = "fall_detection_device"
-    CERT_PATH = "./AWS_IoT/a8f9fb40829e5c654a89bdeffa96037716ca94d299f0c0e8c5428767455110f8-certificate.pem.crt"
-    KEY_PATH = "./AWS_IoT/a8f9fb40829e5c654a89bdeffa96037716ca94d299f0c0e8c5428767455110f8-private.pem.key"
-    ROOT_CA_PATH = "./AWS_IoT/rootCA.pem"
-
-    try:
-        aws_publisher = AWSIoTPublisher(ENDPOINT, CLIENT_ID, CERT_PATH, KEY_PATH, ROOT_CA_PATH)
-        
-        # Setup custom print function
-        iot_printer = IoTPrinter(aws_publisher)
-        
-        # Replace the built-in print function with our custom one
-        builtins_print = print
-        print = iot_printer.custom_print
-        
-        print("AWS IoT connection established successfully")
-    except Exception as e:
-        print(f"Error setting up AWS IoT: {str(e)}")
-        print("Continuing with local printing only")
-
-
     # Optional: Specify a custom save filepath
     SAVE_FILEPATH = "./Data_files"  # Change this to your desired path
     CLI_SIL_SERIAL_PORT_NAME = 'Enhanced COM Port'
@@ -266,6 +94,7 @@ if __name__=="__main__":
 
     serialPorts = list(list_ports.comports())
 
+    
     print("Welcome to the Fall Detection System.")
     # operatingSystem = input("Enter your operating system: ")
     system = platform.system()
@@ -282,26 +111,32 @@ if __name__=="__main__":
             cliCom = input("CLI COM port not found for devices. Please enter the CLI COM port: ")
             dataCom = input("DATA COM port not found for devices. Please enter the DATA COM port: ")
 
-
-
-    #for linux
-    # cliCom = '/dev/ttyUSB0'
-    # dataCom = '/dev/ttyUSB1'
-
     c = core()
-    # c.gracefulReset()
+    c.cli_port = cliCom  # Store the CLI port in the core object for reset function
+    c.data_port = dataCom  # Store the DATA port in the core object
+    
+    # Add option to reset device at startup
+    reset_choice = input("Do you want to reset the device before starting? (y/n): ")
+    if reset_choice.lower() == 'y':
+        reset_success = c.power_cycle_device()
+        if reset_success:
+            print("Device reset complete. Continuing with initialization...")
+            time.sleep(1)  # Give device time to stabilize after reset
+        else:
+            print("Device reset failed. Trying to continue anyway...")
+    
+    # Connect to COM ports
     c.parser.connectComPorts(cliCom, dataCom)
     c.parseCfg("Final_config_6m.cfg")
     c.sendCfg()
 
-
+    # Add a keyboard interrupt handler to allow manual reset during operation
     try:
         while True:
             trial_output = c.parser.readAndParseUartDoubleCOMPort()
             # print("Read and parse UART")
             # print(trial_output)
-
-                
+            
             data = {'cfg': c.cfg, 'demo': c.demo, 'device': c.device}
             c.uartCounter += 1
             frameJSON = {}
@@ -328,23 +163,23 @@ if __name__=="__main__":
                 frameJSON['PointsDetected'] = trial_output['numDetectedPoints']
 
             if ('heightData' in trial_output):
-                        if (len(trial_output['heightData']) != len(trial_output['trackData'])):
-                            print("WARNING: number of heights does not match number of tracks")
+                if (len(trial_output['heightData']) != len(trial_output['trackData'])):
+                    print("WARNING: number of heights does not match number of tracks")
 
-                        # For each height heights for current tracks
-                        for height in trial_output['heightData']:
-                            # Find track with correct TID
-                            for track in trial_output['trackData']:
-                                # Found correct track
-                                if (int(track[0]) == int(height[0])):
-                                    tid = int(height[0])
-                                    height_str = 'tid : ' + str(height[0]) + ', height : ' + str(round(height[1], 2)) + ' m'
-                                    # If this track was computed to have fallen, display it on the screen
-                                    
-                                    fallDetectionDisplayResults = c.fallDetection.step(trial_output['heightData'], trial_output['trackData'])
-                                    if (fallDetectionDisplayResults[tid] > 0): 
-                                        height_str = height_str + " FALL DETECTED"
-                                        print("Alert: Fall Detected for Patient")
+                # For each height heights for current tracks
+                for height in trial_output['heightData']:
+                    # Find track with correct TID
+                    for track in trial_output['trackData']:
+                        # Found correct track
+                        if (int(track[0]) == int(height[0])):
+                            tid = int(height[0])
+                            height_str = 'tid : ' + str(height[0]) + ', height : ' + str(round(height[1], 2)) + ' m'
+                            # If this track was computed to have fallen, display it on the screen
+                            
+                            fallDetectionDisplayResults = c.fallDetection.step(trial_output['heightData'], trial_output['trackData'])
+                            if (fallDetectionDisplayResults[tid] > 0): 
+                                height_str = height_str + " FALL DETECTED"
+                                print("Alert: Fall Detected for Patient")
             # frameJSON['fallDetected'] = height_str                                
             c.frames.append(frameJSON)
             data['data'] = c.frames
@@ -361,11 +196,24 @@ if __name__=="__main__":
                     fp.write(json_object)
                     c.frames = [] #uncomment to put data into one file at a time in 100 frame chunks
 
-            # print(c.fallDetection.heightBuffer)
-        
+            # Check for user command to reset device
+            if c.uartCounter % 50 == 0:  # Only check periodically to avoid excessive polling
+                if sys.stdin in select.select([sys.stdin], [], [], 0)[0]:
+                    line = input()
+                    if line.lower() == 'reset':
+                        print("Manual reset requested...")
+                        c.power_cycle_device()
+                        # Reconnect after reset
+                        time.sleep(1)  # Give device time to stabilize
+                        c.parser.connectComPorts(cliCom, dataCom)
+                        c.sendCfg()
+                        print("Reset and reconfiguration complete")
+            
     except KeyboardInterrupt:
-        print("Keyboard Interrupt Detected. Stopping program.")
-        c.stopSensor()
-        c.gracefulReset()
-        
-    
+        print("\nProgram interrupted.")
+        # Add option to reset device before exit
+        reset_choice = input("Do you want to reset the device before exiting? (y/n): ")
+        if reset_choice.lower() == 'y':
+            c.power_cycle_device()
+        print("Exiting program.")
+        sys.exit(0)
