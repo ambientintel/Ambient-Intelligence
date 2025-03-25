@@ -196,18 +196,18 @@ if __name__=="__main__":
                     fp.write(json_object)
                     c.frames = [] #uncomment to put data into one file at a time in 100 frame chunks
 
-            # Check for user command to reset device
-            if c.uartCounter % 50 == 0:  # Only check periodically to avoid excessive polling
-                if sys.stdin in select.select([sys.stdin], [], [], 0)[0]:
-                    line = input()
-                    if line.lower() == 'reset':
-                        print("Manual reset requested...")
-                        c.power_cycle_device()
-                        # Reconnect after reset
-                        time.sleep(1)  # Give device time to stabilize
-                        c.parser.connectComPorts(cliCom, dataCom)
-                        c.sendCfg()
-                        print("Reset and reconfiguration complete")
+            # # Check for user command to reset device
+            # if c.uartCounter % 50 == 0:  # Only check periodically to avoid excessive polling
+            #     if sys.stdin in select.select([sys.stdin], [], [], 0)[0]:
+            #         line = input()
+            #         if line.lower() == 'reset':
+            #             print("Manual reset requested...")
+            #             c.power_cycle_device()
+            #             # Reconnect after reset
+            #             time.sleep(1)  # Give device time to stabilize
+            #             c.parser.connectComPorts(cliCom, dataCom)
+            #             c.sendCfg()
+            #             print("Reset and reconfiguration complete")
             
     except KeyboardInterrupt:
         print("\nProgram interrupted.")
