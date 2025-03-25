@@ -353,20 +353,20 @@ if __name__=="__main__":
     KEY_PATH = "./AWS_IoT/a8f9fb40829e5c654a89bdeffa96037716ca94d299f0c0e8c5428767455110f8-private.pem.key"
     ROOT_CA_PATH = "./AWS_IoT/rootCA.pem"
 
-    try:
-        aws_publisher = AWSIoTPublisher(ENDPOINT, CLIENT_ID, CERT_PATH, KEY_PATH, ROOT_CA_PATH)
+    # try:
+    #     aws_publisher = AWSIoTPublisher(ENDPOINT, CLIENT_ID, CERT_PATH, KEY_PATH, ROOT_CA_PATH)
         
-        # Setup custom print function
-        iot_printer = IoTPrinter(aws_publisher)
+    #     # Setup custom print function
+    #     iot_printer = IoTPrinter(aws_publisher)
         
-        # Replace the built-in print function with our custom one
-        builtins_print = print
-        print = iot_printer.custom_print
+    #     # Replace the built-in print function with our custom one
+    #     builtins_print = print
+    #     print = iot_printer.custom_print
         
-        print("AWS IoT connection established successfully")
-    except Exception as e:
-        print(f"Error setting up AWS IoT: {str(e)}")
-        print("Continuing with local printing only")
+    #     print("AWS IoT connection established successfully")
+    # except Exception as e:
+    #     print(f"Error setting up AWS IoT: {str(e)}")
+    #     print("Continuing with local printing only")
 
 
     # Optional: Specify a custom save filepath
