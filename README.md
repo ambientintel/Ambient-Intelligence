@@ -254,27 +254,24 @@ Connect is currently in the Beta phase of development.
 
 If Connect isn't already installed in your version of Raspberry Pi OS, open a Terminal window. Run the following command to update your system and packages:
 
-[source,console]
-----
+```bash
 $ sudo apt update
 $ sudo apt full-upgrade
-----
+```
 
 Run the following command on your Raspberry Pi to install Connect:
 
-[source,console]
-----
+```bash
 $ sudo apt install rpi-connect
-----
+```
 
 You can also install Connect from the Recommended Software application.
 
 After installation, use the `rpi-connect` command line interface to start Connect for your current user:
 
-[source,console]
-----
+```bash
 $ rpi-connect on
-----
+```
 
 Alternatively, click the Connect icon in the menu bar to open a dropdown menu and select *Turn On Raspberry Pi Connect*:
 ---
