@@ -273,7 +273,9 @@ After installation, use the `rpi-connect` command line interface to start Connec
 $ rpi-connect on
 ```
 
-Alternatively, click the Connect icon in the menu bar to open a dropdown menu and select *Turn On Raspberry Pi Connect*:
+Alternatively, click the Connect icon in the menu bar to open a dropdown menu and select Turn On Raspberry Pi Connect:
+![image](https://github.com/user-attachments/assets/5ef09ef1-7ffe-4c24-a374-6202825bb128)
+
 ---
 
 ### Contribution
