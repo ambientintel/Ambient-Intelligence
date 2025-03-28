@@ -234,6 +234,23 @@ The processed sensor data, including height data, will be saved in the binData d
 
 ---
 
+## Raspberry Pi Connect (Beta)
+### Introduction
+
+Raspberry Pi Connect provides secure access to your Raspberry Pi from anywhere in the world.
+
+![image](https://github.com/user-attachments/assets/e5f07b70-f546-40de-861b-50631f36bfe4)
+
+To use Connect, install the Connect software and link your device with an account on your Raspberry Pi. Then visit connect.raspberrypi.com to access the desktop or a shell running on your Raspberry Pi in a browser window.
+
+Connect uses a secure, encrypted connection. By default, Connect communicates directly between your Raspberry Pi and your browser. However, when Connect can’t establish a direct connection between your Raspberry Pi and your browser, we use a relay server. In such cases, Raspberry Pi only retains the metadata required to operate Connect.
+
+Connect is currently in the Beta phase of development.
+
+NOTE: To use Connect, your Raspberry Pi must run https://www.raspberrypi.com/news/bookworm-the-new-version-of-raspberry-pi-os/[Raspberry Pi OS Bookworm](https://www.raspberrypi.com/news/bookworm-the-new-version-of-raspberry-pi-os/) or later.
+
+---
+
 ### Contribution
 
 Feel free to fork this repository and submit pull requests for improvements or fixes.
