@@ -250,7 +250,7 @@ Connect is currently in the Beta phase of development.
 > [!NOTE]
 > To use Connect, your Raspberry Pi must run [Raspberry Pi OS Bookworm](https://www.raspberrypi.com/news/bookworm-the-new-version-of-raspberry-pi-os/) or later.
 
-## Install
+### Install
 
 If Connect isn't already installed in your version of Raspberry Pi OS, open a Terminal window. Run the following command to update your system and packages:
 
@@ -275,6 +275,44 @@ $ rpi-connect on
 
 Alternatively, click the Connect icon in the menu bar to open a dropdown menu and select Turn On Raspberry Pi Connect:
 ![image](https://github.com/user-attachments/assets/5ef09ef1-7ffe-4c24-a374-6202825bb128)
+
+### Manually start and stop Connect
+
+To start Connect from the command line, run the following command:
+```bash
+rpi-connect on
+```
+To stop Connect, run the following command:
+```bash
+rpi-connect off
+```
+
+### Link a Raspberry Pi device with a Connect account
+
+Now that you’ve installed and started Connect on your Raspberry Pi device, you must associate your device with your Connect account.
+
+Use the following command to generate a link that will connect your device with your Connect account:
+```bash
+rpi-connect signing
+```
+This command should output something like the following:
+```bash
+Complete sign in by visiting https://connect.raspberrypi.com/verify/XXXX-XXXX
+```
+Visit the verification URL on any device and sign in with your Raspberry Pi ID to link your device with your Connect account.
+
+### Finish linking your Raspberry Pi
+
+After authenticating, assign a name to your device. Choose a name that uniquely identifies the device. Click the Create device and sign in button to continue.
+![image](https://github.com/user-attachments/assets/1684989b-1230-4f68-983b-e21971d16f4e)
+
+You can now remotely connect to your device. The Connect icon in your menu bar will turn blue to indicate that your device is now signed in to the Connect service. You should receive an email notification indicating that a new device is linked to your Connect account.
+![image](https://github.com/user-attachments/assets/44d4bab0-8194-4218-a801-040dcab6aeb2)
+
+> [!WARNING]
+> If you receive an email that says a device that you do not recognise has signed into Connect, change your Raspberry Pi ID password immediately. Remove the device from Connect to permanently disassociate it from your account. Consider enabling two-factor authentication to keep your account secure.
+> Connect signs communication with your device serial number. Moving your SD card between devices will sign you out of Connect.
+
 
 ---
 
