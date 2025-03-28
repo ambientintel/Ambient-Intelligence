@@ -311,6 +311,7 @@ You can now remotely connect to your device. The Connect icon in your menu bar w
 
 > [!WARNING]
 > If you receive an email that says a device that you do not recognise has signed into Connect, change your Raspberry Pi ID password immediately. Remove the device from Connect to permanently disassociate it from your account. Consider enabling two-factor authentication to keep your account secure.
+> [!WARNING]
 > Connect signs communication with your device serial number. Moving your SD card between devices will sign you out of Connect.
 
 
