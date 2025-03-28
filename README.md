@@ -247,7 +247,8 @@ Connect uses a secure, encrypted connection. By default, Connect communicates di
 
 Connect is currently in the Beta phase of development.
 
-NOTE: To use Connect, your Raspberry Pi must run [Raspberry Pi OS Bookworm](https://www.raspberrypi.com/news/bookworm-the-new-version-of-raspberry-pi-os/) or later.
+> [!NOTE]
+> To use Connect, your Raspberry Pi must run [Raspberry Pi OS Bookworm](https://www.raspberrypi.com/news/bookworm-the-new-version-of-raspberry-pi-os/) or later.
 
 ---
 
