@@ -233,6 +233,7 @@ if __name__=="__main__":
             frameJSON['HeightData'] = []
         else:
             frameJSON['HeightData'] = trial_output['heightData'].tolist()
+            print("Height Data: ", frameJSON['HeightData'])
 
         frameJSON['timestamp'] = time.time()
         frameJSON['CurrTime'] = time.ctime(frameJSON['timestamp']) # Add human-readable timestamp
@@ -252,8 +253,6 @@ if __name__=="__main__":
                     for height in trial_output['heightData']:
                         # Find track with correct TID
                         for track in trial_output['trackData']:
-                            print("Track: ", track)
-                            print("Height: ", height)
                             # Found correct track
                             if (int(track[0]) == int(height[0])):
                                 tid = int(height[0])
