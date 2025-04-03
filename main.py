@@ -6,11 +6,11 @@ import os
 import time
 import math
 import numpy as np
-from fall_detection import FallDetection 
 from serial.tools import list_ports
 from contextlib import suppress
 import sys
 import platform
+from fall_detection import FallDetection 
 
 class core:
     def __init__(self):
