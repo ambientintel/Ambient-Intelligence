@@ -210,8 +210,7 @@ if __name__=="__main__":
     c.parser.connectComPorts(cliCom, dataCom)
     c.parseCfg("Final_config_6m.cfg")
     magicByte = c.parser.dataCom.read(1)
-    if (len(magicByte) > 1):
-        c.sendCfg()
+    c.sendCfg()
 
 
 
