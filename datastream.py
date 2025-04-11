@@ -67,13 +67,13 @@ class UARTParser():
             # If the device doesn't transmit any data, the COMPort read function will eventually timeout
             # Which means magicByte will hold no data, and the call to magicByte[0] will produce an error
             # This check ensures we can give a meaningful error
-            # if (len(magicByte) < 1):
-            #     log.error("ERROR: No data detected on COM Port, read timed out")
-            #     log.error("\tBe sure that the device is in the proper mode, and that the cfg you are sending is valid")
-            #     magicByte = self.dataCom.read(1)
+            if (len(magicByte) < 1):
+                log.error("ERROR: No data detected on COM Port, read timed out")
+                log.error("\tBe sure that the device is in the proper mode, and that the cfg you are sending is valid")
+                magicByte = self.dataCom.read(1)
                 
             # Found matching byte
-            if (magicByte[0] == UART_MAGIC_WORD[index]):
+            elif (magicByte[0] == UART_MAGIC_WORD[index]):
                 index += 1
                 frameData.append(magicByte[0])
                 if (index == 8): # Found the full magic word
