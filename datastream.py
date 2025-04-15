@@ -314,5 +314,5 @@ class UARTParser():
             #         sys.exit(1)
         # Give a short amount of time for the buffer to clear
         time.sleep(0.03)
-        # self.cliCom.reset_input_buffer()
+        self.cliCom.reset_input_buffer()
         # NOTE - Do NOT close the CLI port because 6432 will use it after configuration  
