@@ -17,6 +17,7 @@ Datasheet link: [https://www.ti.com/product/IWR6843#reference-designs](url)
   - [Clone the Repository](#clone-the-repository)
   - [Install Dependencies](#install-dependencies)
   - [Run the Main File](#run-the-main-file)
+  - [Create Virtual Environment](#create-a-virtual-environment)
   - [Troubleshooting](#troubleshooting)
 - [Processed Data](#processed-data)
 - [Contribution](#contribution)
@@ -175,6 +176,24 @@ git pull origin main
 ```
 ---
 
+### Create a Virtual Environment
+
+It's recommended to create a virtual environment to isolate the package dependencies from your global Python installation. Navigate to the directory where you have cloned the package and run the below commands.
+
+#### On Linux
+```bash
+python3 -m venv venv
+source venv/bin/activate
+```
+
+#### On Windows:
+```bash
+python -m venv venv
+venv\Scripts\activate
+```
+
+Once activated, your command prompt should show the name of the virtual environment, indicating it's active.
+
 ### Install Dependencies
 
 Install the required Python dependencies using `pip`:
@@ -212,6 +231,90 @@ python main.py
 Processed Data
 
 The processed sensor data, including height data, will be saved in the binData directory as JSON files.
+
+---
+
+## Raspberry Pi Connect (Beta)
+### Introduction
+
+Raspberry Pi Connect provides secure access to your Raspberry Pi from anywhere in the world.
+
+![image](https://github.com/user-attachments/assets/e5f07b70-f546-40de-861b-50631f36bfe4)
+
+To use Connect, install the Connect software and link your device with an account on your Raspberry Pi. Then visit connect.raspberrypi.com to access the desktop or a shell running on your Raspberry Pi in a browser window.
+
+Connect uses a secure, encrypted connection. By default, Connect communicates directly between your Raspberry Pi and your browser. However, when Connect can’t establish a direct connection between your Raspberry Pi and your browser, we use a relay server. In such cases, Raspberry Pi only retains the metadata required to operate Connect.
+
+Connect is currently in the Beta phase of development.
+
+> [!NOTE]
+> To use Connect, your Raspberry Pi must run [Raspberry Pi OS Bookworm](https://www.raspberrypi.com/news/bookworm-the-new-version-of-raspberry-pi-os/) or later.
+
+### Install
+
+If Connect isn't already installed in your version of Raspberry Pi OS, open a Terminal window. Run the following command to update your system and packages:
+
+```bash
+$ sudo apt update
+$ sudo apt full-upgrade
+```
+
+Run the following command on your Raspberry Pi to install Connect:
+
+```bash
+$ sudo apt install rpi-connect
+```
+
+You can also install Connect from the Recommended Software application.
+
+After installation, use the `rpi-connect` command line interface to start Connect for your current user:
+
+```bash
+$ rpi-connect on
+```
+
+Alternatively, click the Connect icon in the menu bar to open a dropdown menu and select Turn On Raspberry Pi Connect:
+![image](https://github.com/user-attachments/assets/5ef09ef1-7ffe-4c24-a374-6202825bb128)
+
+### Manually start and stop Connect
+
+To start Connect from the command line, run the following command:
+```bash
+rpi-connect on
+```
+To stop Connect, run the following command:
+```bash
+rpi-connect off
+```
+
+### Link a Raspberry Pi device with a Connect account
+
+Now that you’ve installed and started Connect on your Raspberry Pi device, you must associate your device with your Connect account.
+
+Use the following command to generate a link that will connect your device with your Connect account:
+```bash
+rpi-connect signing
+```
+This command should output something like the following:
+```bash
+Complete sign in by visiting https://connect.raspberrypi.com/verify/XXXX-XXXX
+```
+Visit the verification URL on any device and sign in with your Raspberry Pi ID to link your device with your Connect account.
+
+### Finish linking your Raspberry Pi
+
+After authenticating, assign a name to your device. Choose a name that uniquely identifies the device. Click the Create device and sign in button to continue.
+![image](https://github.com/user-attachments/assets/1684989b-1230-4f68-983b-e21971d16f4e)
+
+You can now remotely connect to your device. The Connect icon in your menu bar will turn blue to indicate that your device is now signed in to the Connect service. You should receive an email notification indicating that a new device is linked to your Connect account.
+![image](https://github.com/user-attachments/assets/44d4bab0-8194-4218-a801-040dcab6aeb2)
+
+> [!WARNING]
+> If you receive an email that says a device that you do not recognise has signed into Connect, change your Raspberry Pi ID password immediately. Remove the device from Connect to permanently disassociate it from your account. Consider enabling two-factor authentication to keep your account secure.
+
+> [!WARNING]
+> Connect signs communication with your device serial number. Moving your SD card between devices will sign you out of Connect.
+
 
 ---
 
