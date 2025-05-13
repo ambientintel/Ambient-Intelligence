@@ -10,7 +10,7 @@ The fall detection algorithm in `fall_detection.py` implements a height-based ap
 
 ### Core Components
 
-<img src="https://github.com/user-attachments/assets/3b09ce27-cda9-4195-8077-5b90358346ed" alt="Core Components" style="width:50%; height:auto;">
+<img src="https://github.com/user-attachments/assets/3b09ce27-cda9-4195-8077-5b90358346ed" alt="Core Components" style="width:30%; height:auto;">
 
 
 ### Initialization Process
