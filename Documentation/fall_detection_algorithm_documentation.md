@@ -6,54 +6,17 @@ The fall detection algorithm in `fall_detection.py` implements a height-based ap
 
 ### Algorithm Overview
 
-```
-+---------------------+    +---------------------+    +---------------------+
-|                     |    |                     |    |                     |
-| Height Data         |---→| Height History      |---→| Height Comparison   |
-| Collection          |    | Buffer Management   |    | & Fall Detection    |
-|                     |    |                     |    |                     |
-+---------------------+    +---------------------+    +---------------------+
-
-
-```
 ![ChatGPT Image May 13, 2025, 03_19_40 PM](https://github.com/user-attachments/assets/529a6133-ef04-4c1e-89a5-6c10876ad110)
 
 ### Core Components
 
-```
-+--------------------------------------+
-| FallDetection Class                  |
-+--------------------------------------+
-| Parameters:                          |
-| - maxNumTracks (default: 30)         |
-| - frameTime (default: 55 ms)         |
-| - fallingThresholdProp (default: 0.6)|
-| - secondsInFallBuffer (default: 1.5) |
-+--------------------------------------+
-| Buffers:                             |
-| - heightBuffer (circular buffers)    |
-| - tracksIDsInPreviousFrame           |
-| - fallBufferDisplay                  |
-+--------------------------------------+
-| Methods:                             |
-| - setFallSensitivity()               |
-| - step()                             |
-+--------------------------------------+
 ![ChatGPT Image May 13, 2025, 03_25_53 PM](https://github.com/user-attachments/assets/3b09ce27-cda9-4195-8077-5b90358346ed)
 
-```
 
 ### Initialization Process
 
-```
- +-----------------+     +-----------------+     +-----------------+
- | Calculate buffer |     | Initialize      |     | Initialize      |
- | length based on  |---->| height history  |---->| fall display    |
- | frame time       |     | circular buffers|     | buffer          |
- +-----------------+     +-----------------+     +-----------------+
 ![ChatGPT Image May 13, 2025, 03_29_41 PM](https://github.com/user-attachments/assets/bc6a5492-aa12-47b0-b8b5-9ea482c23892)
 
-```
 
 The algorithm initializes with the following steps:
 1. Calculates the height history buffer length based on frame time and desired history duration
@@ -62,63 +25,15 @@ The algorithm initializes with the following steps:
 
 ### Height Data Processing Flow
 
-```
-                                      ┌─────────────────────┐
-                                      │                     │
-           ┌──────────────────────────┤   New Frame Data    │
-           │                          │                     │
-           │                          └─────────────────────┘
-           │
-           ▼
-┌─────────────────────┐              ┌─────────────────────┐
-│                     │              │                     │
-│  Decrement fall     │              │   Process height    │
-│  display counters   │──────────────┤   data for each     │
-│                     │              │   tracked person    │
-└─────────────────────┘              │                     │
-                                     └──────────┬──────────┘
-                                                │
-                                                │
-                                                ▼
-┌─────────────────────┐              ┌─────────────────────┐
-│                     │              │                     │
-│  Reset buffers for  │◄─────────────┤   Record current    │
-│  inactive tracks    │              │   track IDs         │
-│                     │              │                     │
-└─────────────────────┘              └─────────────────────┘
+
 ![ChatGPT Image May 13, 2025, 03_32_27 PM](https://github.com/user-attachments/assets/1d2b7d38-7eb1-418b-8b9a-5cfbf0004a06)
 
-```
 
 ### Fall Detection Logic
 
-```
-┌─────────────────────┐              ┌─────────────────────┐              ┌─────────────────────┐
-│                     │              │                     │              │                     │
-│  Receive height     │──────────────┤   Store in height   │──────────────┤   Compare current   │
-│  measurement        │              │   history buffer    │              │   vs. historical    │
-│                     │              │                     │              │   height            │
-└─────────────────────┘              └─────────────────────┘              └──────────┬──────────┘
-                                                                                     │
-                                                                                     │
-                                                                                     ▼
-                                                                          ┌─────────────────────┐
-                                                                          │                     │
-                                                                          │   current_height    │
-                                                                          │   ────────────── < 0.6 ?  │
-                                                                          │   historical_height │
-                                                                          │                     │
-                                                                          └──────────┬──────────┘
-                                                                                     │
-                                     ┌─────────────────────┐              ┌──────────▼──────────┐
-                                     │                     │              │                     │
-                                     │   Mark fall in      │◄─────────────┤   Yes = Fall        │
-                                     │   display buffer    │              │   No = Normal       │
-                                     │                     │              │                     │
-                                     └─────────────────────┘              └─────────────────────┘
+
 ![ChatGPT Image May 13, 2025, 03_40_29 PM](https://github.com/user-attachments/assets/3e3abd2b-f19b-46bf-ae40-9424f5a08b28)
 
-```
 
 ### Algorithm Implementation Details
 
