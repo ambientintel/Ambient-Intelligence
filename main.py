@@ -11,6 +11,7 @@ from contextlib import suppress
 import sys
 import platform
 from fall_detection import FallDetection 
+# from new_fall_detection import FallDetection
 
 class core:
     def __init__(self):
