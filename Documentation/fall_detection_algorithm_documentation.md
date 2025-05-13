@@ -7,7 +7,7 @@ The fall detection algorithm in `fall_detection.py` implements a height-based ap
 ### Algorithm Overview
 
 ![ChatGPT Image May 13, 2025, 03_19_40 PM](https://github.com/user-attachments/assets/529a6133-ef04-4c1e-89a5-6c10876ad110)
-<img src="[image-url](https://github.com/user-attachments/assets/529a6133-ef04-4c1e-89a5-6c10876ad110)" alt="Overview" style="width:50%; height:auto;">
+<img src="https://github.com/user-attachments/assets/529a6133-ef04-4c1e-89a5-6c10876ad110" alt="Overview" style="width:50%; height:auto;">
 
 ### Core Components
 
