@@ -6,18 +6,15 @@ The fall detection algorithm in `fall_detection.py` implements a height-based ap
 
 ### Algorithm Overview
 
-![ChatGPT Image May 13, 2025, 03_19_40 PM](https://github.com/user-attachments/assets/529a6133-ef04-4c1e-89a5-6c10876ad110)
 <img src="https://github.com/user-attachments/assets/529a6133-ef04-4c1e-89a5-6c10876ad110" alt="Overview" style="width:50%; height:auto;">
 
 ### Core Components
 
-![ChatGPT Image May 13, 2025, 03_25_53 PM](https://github.com/user-attachments/assets/3b09ce27-cda9-4195-8077-5b90358346ed)
 <img src="https://github.com/user-attachments/assets/3b09ce27-cda9-4195-8077-5b90358346ed" alt="Core Components" style="width:50%; height:auto;">
 
 
 ### Initialization Process
 
-![ChatGPT Image May 13, 2025, 03_29_41 PM](https://github.com/user-attachments/assets/bc6a5492-aa12-47b0-b8b5-9ea482c23892)
 <img src="https://github.com/user-attachments/assets/bc6a5492-aa12-47b0-b8b5-9ea482c23892" alt="Initialization Process" style="width:50%; height:auto;">
 
 
@@ -28,15 +25,11 @@ The algorithm initializes with the following steps:
 
 ### Height Data Processing Flow
 
-
-![ChatGPT Image May 13, 2025, 03_32_27 PM](https://github.com/user-attachments/assets/1d2b7d38-7eb1-418b-8b9a-5cfbf0004a06)
 <img src="https://github.com/user-attachments/assets/1d2b7d38-7eb1-418b-8b9a-5cfbf0004a06" alt="Data Processing" style="width:50%; height:auto;">
 
 
 ### Fall Detection Logic
 
-
-![ChatGPT Image May 13, 2025, 03_40_29 PM](https://github.com/user-attachments/assets/3e3abd2b-f19b-46bf-ae40-9424f5a08b28)
 <img src="https://github.com/user-attachments/assets/3e3abd2b-f19b-46bf-ae40-9424f5a08b28" alt="Alt Text" style="width:50%; height:auto;">
 
 
