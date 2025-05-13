@@ -27,7 +27,6 @@ class UARTParser():
         self.filepath = datetime.datetime.now().strftime("%m_%d_%Y_%H_%M_%S")
         self.parserType = type
         self.dataCom = None
-        self.cliCom = None
         self.isLowPowerDevice = False
         self.cfg = ""
         self.demo = ""
@@ -44,6 +43,45 @@ class UARTParser():
         self.dataCom.reset_output_buffer()
         log.info('Connected')
 
+    def reset_radar_device(self):
+        """
+        Reset the mmWave radar device by sending required commands in proper sequence.
+        This ensures a clean state for the device before starting the algorithm.
+        """
+        if not hasattr(self, 'cliCom') or not self.cliCom.is_open:
+            log.error("Cannot reset radar: CLI COM port not connected or not open")
+            return False
+            
+        try:
+            # Step 1: Stop the sensor
+            log.info("Sending sensorStop command")
+            self.cliCom.write("sensorStop\n".encode())
+            time.sleep(0.5)  # Give time for the command to be processed
+            
+            # Step 2: Flush the configuration
+            log.info("Sending flushCfg command")
+            self.cliCom.write("flushCfg\n".encode())
+            time.sleep(0.5)
+            
+            # Step 3: Clear all buffers
+            self.cliCom.reset_input_buffer()
+            self.cliCom.reset_output_buffer()
+            if self.dataCom and self.dataCom.is_open:
+                self.dataCom.reset_input_buffer()
+                self.dataCom.reset_output_buffer()
+                
+            # Step 4: Reset internal state
+            self.frames = []
+            self.uartCounter = 0
+            self.binData = bytearray(0)
+            self.first_file = True
+            
+            log.info("mmWave radar device reset complete")
+            return True
+            
+        except Exception as e:
+            log.error(f"Error resetting radar device: {e}")
+            return False
 
     def setSaveBinary(self, saveBinary = 1):
         self.saveBinary = saveBinary
@@ -69,7 +107,6 @@ class UARTParser():
             # Which means magicByte will hold no data, and the call to magicByte[0] will produce an error
             # This check ensures we can give a meaningful error
             if (len(magicByte) < 1):
-                print(self.dataCom.read(1))
                 log.error("ERROR: No data detected on COM Port, read timed out")
                 log.error("\tBe sure that the device is in the proper mode, and that the cfg you are sending is valid")
                 magicByte = self.dataCom.read(1)
@@ -318,16 +355,3 @@ class UARTParser():
         time.sleep(0.03)
         self.cliCom.reset_input_buffer()
         # NOTE - Do NOT close the CLI port because 6432 will use it after configuration  
-
-    def sendLine(self, line):
-        if(self.cliCom.baudrate == 1250000):
-            for char in [*line]:
-                time.sleep(.001) # Character delay. Required for demos which are 1250000 baud by default else characters are skipped
-                self.cliCom.write(char.encode())
-        else:
-            self.cliCom.write(line.encode())
-        ack = self.cliCom.readline()
-        print(ack)
-        ack = self.cliCom.readline()
-        print(ack)
-    
