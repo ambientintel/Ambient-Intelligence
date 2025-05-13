@@ -13,6 +13,8 @@ The fall detection algorithm in `fall_detection.py` implements a height-based ap
 | Collection          |    | Buffer Management   |    | & Fall Detection    |
 |                     |    |                     |    |                     |
 +---------------------+    +---------------------+    +---------------------+
+![ChatGPT Image May 13, 2025, 03_19_40 PM](https://github.com/user-attachments/assets/529a6133-ef04-4c1e-89a5-6c10876ad110)
+
 ```
 
 ### Core Components
@@ -36,6 +38,8 @@ The fall detection algorithm in `fall_detection.py` implements a height-based ap
 | - setFallSensitivity()               |
 | - step()                             |
 +--------------------------------------+
+![ChatGPT Image May 13, 2025, 03_25_53 PM](https://github.com/user-attachments/assets/3b09ce27-cda9-4195-8077-5b90358346ed)
+
 ```
 
 ### Initialization Process
@@ -46,6 +50,8 @@ The fall detection algorithm in `fall_detection.py` implements a height-based ap
  | length based on  |---->| height history  |---->| fall display    |
  | frame time       |     | circular buffers|     | buffer          |
  +-----------------+     +-----------------+     +-----------------+
+![ChatGPT Image May 13, 2025, 03_29_41 PM](https://github.com/user-attachments/assets/bc6a5492-aa12-47b0-b8b5-9ea482c23892)
+
 ```
 
 The algorithm initializes with the following steps:
@@ -79,6 +85,8 @@ The algorithm initializes with the following steps:
 │  inactive tracks    │              │   track IDs         │
 │                     │              │                     │
 └─────────────────────┘              └─────────────────────┘
+![ChatGPT Image May 13, 2025, 03_32_27 PM](https://github.com/user-attachments/assets/1d2b7d38-7eb1-418b-8b9a-5cfbf0004a06)
+
 ```
 
 ### Fall Detection Logic
@@ -107,6 +115,8 @@ The algorithm initializes with the following steps:
                                      │   display buffer    │              │   No = Normal       │
                                      │                     │              │                     │
                                      └─────────────────────┘              └─────────────────────┘
+![ChatGPT Image May 13, 2025, 03_40_29 PM](https://github.com/user-attachments/assets/3e3abd2b-f19b-46bf-ae40-9424f5a08b28)
+
 ```
 
 ### Algorithm Implementation Details
@@ -179,6 +189,9 @@ Standing position:                 ┌─┐             Fall position:
                                                                  
                                                                  Ratio = 0.18 < 0.6
                                                                  FALL DETECTED
+
+![ChatGPT Image May 13, 2025, 03_42_53 PM](https://github.com/user-attachments/assets/14a3c3a2-1f0a-4d1a-9836-7f05f4cde6e2)
+
 ```
 
 ### Sensitivity Configuration
