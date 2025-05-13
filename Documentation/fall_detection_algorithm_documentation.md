@@ -25,7 +25,7 @@ The algorithm initializes with the following steps:
 
 ### Height Data Processing Flow
 
-<img src="https://github.com/user-attachments/assets/1d2b7d38-7eb1-418b-8b9a-5cfbf0004a06" alt="Data Processing" style="width:50%; height:auto;">
+<img src="https://github.com/user-attachments/assets/1d2b7d38-7eb1-418b-8b9a-5cfbf0004a06" alt="Data Processing" style="width:30%; height:auto;">
 
 
 ### Fall Detection Logic
