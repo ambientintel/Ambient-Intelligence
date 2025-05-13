@@ -87,26 +87,8 @@ def step(self, heights, tracks):
 
 ### Fall Detection Visualization
 
-```
-Standing position:                 ┌─┐             Fall position:             
-(height = 1.7m)                    │ │                                   ┌─┐
-                                   │ │                                   │ │
-                                   │ │                                   │ │
-                                   │ │                                   │ │
-                                   │ │                                   │ │
-                                ┌──┴─┴──┐                             ───┴─┴───
-                                │       │                                
-                                │       │                                
-                                │       │                                
-───────────────────────────────┴───────┴────────────────────────────────────────
-                          Historical Height = 1.7m               Current Height = 0.3m
-                                                                 
-                                                                 Ratio = 0.18 < 0.6
-                                                                 FALL DETECTED
+<img src="https://github.com/user-attachments/assets/14a3c3a2-1f0a-4d1a-9836-7f05f4cde6e2" alt="Alt Text" style="width:50%; height:auto;">
 
-![ChatGPT Image May 13, 2025, 03_42_53 PM](https://github.com/user-attachments/assets/14a3c3a2-1f0a-4d1a-9836-7f05f4cde6e2)
-
-```
 
 ### Sensitivity Configuration
 
