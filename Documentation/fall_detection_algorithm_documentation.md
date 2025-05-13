@@ -13,9 +13,10 @@ The fall detection algorithm in `fall_detection.py` implements a height-based ap
 | Collection          |    | Buffer Management   |    | & Fall Detection    |
 |                     |    |                     |    |                     |
 +---------------------+    +---------------------+    +---------------------+
-![ChatGPT Image May 13, 2025, 03_19_40 PM](https://github.com/user-attachments/assets/529a6133-ef04-4c1e-89a5-6c10876ad110)
+
 
 ```
+![ChatGPT Image May 13, 2025, 03_19_40 PM](https://github.com/user-attachments/assets/529a6133-ef04-4c1e-89a5-6c10876ad110)
 
 ### Core Components
 
