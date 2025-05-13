@@ -11,6 +11,19 @@ from contextlib import suppress
 import sys
 import platform
 from fall_detection import FallDetection 
+import logging
+
+# Import our new radar reset functionality
+try:
+    from radar_reset import reset_radar, hardware_reset_radar, software_reset_radar
+    HAS_PYFTDI_RESET = True
+except ImportError:
+    print("Warning: PyFTDI radar reset not available. Falling back to basic reset.")
+    HAS_PYFTDI_RESET = False
+
+# Configure logging
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+logger = logging.getLogger(__name__)
 
 class core:
     def __init__(self):
@@ -62,25 +75,50 @@ class core:
         """Reset the mmWave radar and all tracking states before starting the algorithm."""
         print("Resetting mmWave radar...")
         
-        # Use the dedicated reset method in the UARTParser class
-        if self.parser.reset_radar_device():
-            # Reset the tracking state
-            self.tracking_data = []
-            self.frames = []
-            self.uartCounter = 0
-            
-            # Create a fresh FallDetection instance to reset all internal buffers and state
-            self.fallDetection = FallDetection()
-            
-            # Parse and send the configuration
+        reset_success = False
+        
+        # First try PyFTDI hardware reset if available
+        if HAS_PYFTDI_RESET:
+            print("Attempting hardware reset using PyFTDI...")
+            try:
+                # Try a full hardware+software reset first
+                reset_success = reset_radar()
+                if reset_success:
+                    print("PyFTDI radar reset successful")
+                else:
+                    print("PyFTDI radar reset failed, falling back to basic reset")
+            except Exception as e:
+                print(f"Error during PyFTDI reset: {e}")
+                print("Falling back to basic reset")
+        
+        # If PyFTDI reset failed or isn't available, use the basic reset method
+        if not reset_success:
+            # Use the dedicated reset method in the UARTParser class
+            reset_success = self.parser.reset_radar_device()
+        
+        # Reset internal tracking state regardless of reset method success
+        self.tracking_data = []
+        self.frames = []
+        self.uartCounter = 0
+        
+        # Create a fresh FallDetection instance to reset all internal buffers and state
+        self.fallDetection = FallDetection()
+        
+        # Parse and send the configuration
+        try:
             self.parseCfg("Final_config_6m.cfg")
             self.sendCfg()
-            
+            print("Radar configuration sent successfully")
+        except Exception as e:
+            print(f"Error sending configuration: {e}")
+            reset_success = False
+        
+        if reset_success:
             print("Radar reset complete.")
-            return True
         else:
             print("Failed to reset radar. Check connections and try again.")
-            return False
+            
+        return reset_success
 
     def parseCfg(self, fname):
         # if (self.replay):
@@ -238,8 +276,22 @@ if __name__=="__main__":
         c.parser.connectComPorts(cliCom, dataCom)
         
         # Reset the radar before starting the algorithm
-        if not c.reset_radar():
-            print("ERROR: Failed to reset the radar. Attempting to continue anyway...")
+        reset_attempts = 0
+        max_reset_attempts = 3
+        reset_success = False
+        
+        while reset_attempts < max_reset_attempts and not reset_success:
+            reset_attempts += 1
+            print(f"Reset attempt {reset_attempts}/{max_reset_attempts}")
+            reset_success = c.reset_radar()
+            if not reset_success and reset_attempts < max_reset_attempts:
+                print(f"Reset attempt {reset_attempts} failed. Retrying...")
+                time.sleep(2)  # Wait before retry
+        
+        if not reset_success:
+            print("WARNING: All reset attempts failed. Attempting to continue anyway...")
+        else:
+            print(f"Radar reset successful on attempt {reset_attempts}/{max_reset_attempts}")
         
         print("Starting fall detection algorithm...")
         # Main processing loop
@@ -324,7 +376,7 @@ if __name__=="__main__":
             except Exception as e:
                 print(f"ERROR in main loop: {e}")
                 # If there's an error, attempt to reset the radar and continue
-                print("Attempting to reset the radar...")
+                print("Attempting to reset the radar due to error...")
                 c.reset_radar()
     
     except Exception as e:
