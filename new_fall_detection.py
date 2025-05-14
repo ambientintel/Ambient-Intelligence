@@ -1,5 +1,6 @@
 from collections import deque
 import copy 
+import numpy as np
 
 class FallDetection:
 
