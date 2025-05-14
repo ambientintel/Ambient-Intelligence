@@ -7,8 +7,8 @@ class FallDetection:
 
     # Initialize the class with the default parameters 
     def __init__(self, maxNumTracks=30, frameTime=55, fallingThresholdProportion=0.7, 
-                 secondsInFallBuffer=1.5, velocity_threshold=0.2, 
-                 acc_threshold=0.3, min_confidence=0.6):
+                 secondsInFallBuffer=1.5, velocity_threshold=0.1, 
+                 acc_threshold=0.1, min_confidence=0.6):
         # Core parameters
         self.fallingThresholdProportion = fallingThresholdProportion
         self.velocity_threshold = velocity_threshold
