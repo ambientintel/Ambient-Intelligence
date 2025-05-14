@@ -73,7 +73,7 @@ class FallDetection:
         # Height-based criterion (original)
         height_ratio = 0
         if self.heightBuffer[tid][-1] > 0 and self.heightBuffer[tid][0] > 0:
-            height_ratio = self.heightBuffer[tid][0] / max(self.heightBuffer[tid][-1], 0.1)
+            height_ratio = self.heightBuffer[tid][0] / self.heightBuffer[tid][-1]
         height_criterion = height_ratio < self.fallingThresholdProportion
         
         # Velocity-based criterion
