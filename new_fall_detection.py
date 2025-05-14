@@ -95,15 +95,15 @@ class FallDetection:
         # Calculate confidence score (weighted combination)
         confidence = 0.0
         if height_criterion:
-            confidence += 0.5 * (1 - height_ratio/self.fallingThresholdProportion)
+            confidence += 0.7 * (1 - height_ratio/self.fallingThresholdProportion)
             
         if velocity_criterion:
             max_velocity = min(velocity_values) if any(velocity_values) and min(velocity_values) != -5 else 0
-            confidence += 0.3 * min(1.0, abs(max_velocity) / self.velocity_threshold)
+            confidence += 0.15 * min(1.0, abs(max_velocity) / self.velocity_threshold)
             
         if acc_criterion:
             max_acc = min(acc_values) if any(acc_values) else 0
-            confidence += 0.2 * min(1.0, abs(max_acc) / self.acc_threshold)
+            confidence += 0.15 * min(1.0, abs(max_acc) / self.acc_threshold)
             
         # Check for overall confidence threshold
         is_fall = confidence >= self.min_confidence
