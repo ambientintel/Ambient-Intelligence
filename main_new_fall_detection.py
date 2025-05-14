@@ -277,7 +277,7 @@ if __name__=="__main__":
             frameJSON['fallAlerts'] = c.fallDetection.getFallAlerts()
             
             # Print current heights for debug purposes
-            print(f"Current heights: {trial_output['heightData']}")
+            # print(f"Current heights: {trial_output['heightData']}")
             for i, height in enumerate(trial_output['heightData']):
                 print(f"Track {height[0]}: Height = {height[1]:.2f}m")
             
