@@ -209,9 +209,13 @@ if __name__=="__main__":
 
     c = core()
     c.parser.connectComPorts(cliCom, dataCom)
-    c.parseCfg("Final_config_6m.cfg")
-    # magicByte = c.parser.dataCom.read(1)
-    c.sendCfg()
+    LastByte = c.parser.dataCom.read(1)
+    if (len(LastByte) < 1):
+        print("Device is not configured, configuring device with default config")
+        c.parseCfg("Final_config_6m.cfg")
+        c.sendCfg()
+    else:
+        print("Device is already configured")
 
 
 

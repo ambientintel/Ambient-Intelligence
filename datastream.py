@@ -43,7 +43,6 @@ class UARTParser():
         self.dataCom.reset_output_buffer()
         log.info('Connected')
 
-
     def setSaveBinary(self, saveBinary = 1):
         self.saveBinary = saveBinary
 
@@ -269,13 +268,6 @@ class UARTParser():
                     self.frames = [] #uncomment to put data into one file at a time in 100 frame chunks
         
         return outputDict
-
-# while True:
-#     bytecount = ser.inWaiting()
-#     s = ser.read(bytecount)
-#     print(s)
-
-# ser.close()
 
     def sendCfg(self, cfg):
         # Remove empty lines from the cfg
