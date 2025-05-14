@@ -6,9 +6,9 @@ import time
 class FallDetection:
 
     # Initialize the class with the default parameters 
-    def __init__(self, maxNumTracks=30, frameTime=55, fallingThresholdProportion=0.6, 
-                 secondsInFallBuffer=1.5, velocity_threshold=0.3, 
-                 acc_threshold=0.4, min_confidence=0.7):
+    def __init__(self, maxNumTracks=30, frameTime=55, fallingThresholdProportion=0.7, 
+                 secondsInFallBuffer=1.5, velocity_threshold=0.2, 
+                 acc_threshold=0.3, min_confidence=0.6):
         # Core parameters
         self.fallingThresholdProportion = fallingThresholdProportion
         self.velocity_threshold = velocity_threshold
@@ -31,11 +31,19 @@ class FallDetection:
         # Fall confidence tracking
         self.fallConfidence = [0.0 for i in range(maxNumTracks)]
         self.lastFallTime = [0 for i in range(maxNumTracks)]
-        self.cooldownPeriod = 10  # seconds between possible repeated fall detections
+        self.cooldownPeriod = 5  # seconds between possible repeated fall detections (reduced from 10)
         
         # Fall alerts
         self.fallAlerts = []  # Store fall alert information
         self.alertSent = [False for i in range(maxNumTracks)]
+        
+        # Print initialization parameters
+        print(f"Fall Detection initialized with parameters:")
+        print(f" - Height threshold ratio: {self.fallingThresholdProportion}")
+        print(f" - Velocity threshold: {self.velocity_threshold}")
+        print(f" - Acceleration threshold: {self.acc_threshold}")
+        print(f" - Minimum confidence: {self.min_confidence}")
+        print(f" - Cooldown period: {self.cooldownPeriod} seconds")
 
     # Sensitivity as given by the FallDetectionSliderClass instance
     def setFallSensitivity(self, fallingThresholdProportion):
@@ -71,6 +79,7 @@ class FallDetection:
         # Velocity-based criterion
         velocity_values = list(self.velocityBuffer[tid])
         velocity_criterion = False
+        max_velocity = 0
         if any(velocity_values) and min(velocity_values) != -5:
             max_velocity = min(velocity_values)  # min because negative velocity means downward movement
             velocity_criterion = max_velocity < -self.velocity_threshold
@@ -78,6 +87,7 @@ class FallDetection:
         # Acceleration-based criterion
         acc_values = list(self.accelerationBuffer[tid])
         acc_criterion = False
+        max_acc = 0
         if any(acc_values):
             max_acc = min(acc_values)  # Sudden negative acceleration
             acc_criterion = max_acc < -self.acc_threshold
@@ -105,6 +115,17 @@ class FallDetection:
             
         # Update fall confidence
         self.fallConfidence[tid] = confidence
+        
+        # Print detection criteria for debugging
+        if confidence > 0.3:  # Only print if there's some level of confidence
+            print(f"Fall detection for Track {tid}:")
+            print(f" - Current height: {self.heightBuffer[tid][0]:.2f}, Original height: {self.heightBuffer[tid][-1]:.2f}")
+            print(f" - Height ratio: {height_ratio:.2f} (Threshold: {self.fallingThresholdProportion})")
+            print(f" - Max velocity: {max_velocity:.2f} (Threshold: -{self.velocity_threshold})")
+            print(f" - Max acceleration: {max_acc:.2f} (Threshold: -{self.acc_threshold})")
+            print(f" - Confidence: {confidence:.2f} (Min required: {self.min_confidence})")
+            print(f" - Is fall: {is_fall}")
+            print(f" - Time since last fall: {current_time - self.lastFallTime[tid]:.2f}s (Cooldown: {self.cooldownPeriod}s)")
         
         # Record fall time if detected
         if is_fall:
@@ -186,7 +207,9 @@ class FallDetection:
         }
         self.fallAlerts.append(alert)
         # Implementation to send the alert via notification system, email, etc. would go here
+        print("\n" + "="*50)
         print(f"FALL DETECTED - Track ID: {tid}, Confidence: {confidence:.2f}, Time: {timestamp}")
+        print("="*50 + "\n")
         
     def getFallAlerts(self):
         """

@@ -270,10 +270,16 @@ if __name__=="__main__":
             # Check for any detected falls
             for tid, fall_status in enumerate(fallDetectionResults):
                 if fall_status > 0:
-                    print(f"Alert: Fall Detected for Track ID {tid}")
-                    
+                    print(f"Main Loop - Fall Alert: Track ID {tid} with status {fall_status}")
+                    # No need to send alert here as it's already done in the FallDetection class
+            
             # Store fall alerts in the frame data
             frameJSON['fallAlerts'] = c.fallDetection.getFallAlerts()
+            
+            # Print current heights for debug purposes
+            print(f"Current heights: {trial_output['heightData']}")
+            for i, height in enumerate(trial_output['heightData']):
+                print(f"Track {height[0]}: Height = {height[1]:.2f}m")
             
         c.frames.append(frameJSON)
         data['data'] = c.frames
