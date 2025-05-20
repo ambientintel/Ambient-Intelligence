@@ -293,7 +293,7 @@ Now that you’ve installed and started Connect on your Raspberry Pi device, you
 
 Use the following command to generate a link that will connect your device with your Connect account:
 ```bash
-rpi-connect signing
+rpi-connect signin
 ```
 This command should output something like the following:
 ```bash
