@@ -226,7 +226,7 @@ python main.py
 To configure the system to automatically start the fall detection application on boot, follow these steps:
 
 #### Step 1: Clone and Setup the Repository
-1. Open a terminal and clone the repository:
+1. Open a terminal and clone the repository. If already the repository is already cloned, skip this step:
    ```bash
    git clone https://github.com/Turtlelord-2k/Ambient-Intelligence.git
    ```
