@@ -17,9 +17,11 @@ Datasheet link: [https://www.ti.com/product/IWR6843#reference-designs](url)
   - [Clone the Repository](#clone-the-repository)
   - [Install Dependencies](#install-dependencies)
   - [Run the Main File](#run-the-main-file)
+  - [Setting Up Autostart (Linux/Raspberry Pi)](#setting-up-autostart-linuxraspberry-pi)
   - [Create Virtual Environment](#create-a-virtual-environment)
   - [Troubleshooting](#troubleshooting)
 - [Processed Data](#processed-data)
+- [Raspberry Pi Connect (Beta)](#raspberry-pi-connect-beta)
 - [Contribution](#contribution)
 - [License](#license)
 
@@ -92,7 +94,7 @@ For further tuning, refer [here](Documentation/Motion_Presence_Detection_Demo_Gr
 ### Tracking module in the overall processing chain
 ![image](https://github.com/user-attachments/assets/e68dd8bd-bd5d-47b4-9753-bab573356c56)
 
-The input to the group tracker is a set of measurement points from the detection layer called the “point cloud”. Each of the measurement point obtained from the detection layer includes in spherical coordinates the measured range, azimuth, elevation, and radial velocity of the point. The tracker motion model used is a 3D constant acceleration model characterized by a 9 element State vector S: [𝑥(𝑛) 𝑦(𝑛) 𝑧(𝑛) 𝑥̇(𝑛) 𝑦̇(𝑛) 𝑧̇(𝑛) 𝑥̈(𝑛) 𝑦̈(𝑛) 𝑧̈(𝑛)] in Cartesian space. It should be noted that the measurement vector is related to the state vector through a non-linear transformation (due to trigonometric operations required to convert from spherical to Cartesian coordinates). A variant of Kalman Filter called the Extended Kalman Filter (EKF) is used in the group tracker that linearizes the nonlinear function using the derivative of the non-linear function around current state estimates. Please refer to the group tracker implementation guide for more details on the algorithm [1].
+The input to the group tracker is a set of measurement points from the detection layer called the "point cloud". Each of the measurement point obtained from the detection layer includes in spherical coordinates the measured range, azimuth, elevation, and radial velocity of the point. The tracker motion model used is a 3D constant acceleration model characterized by a 9 element State vector S: [𝑥(𝑛) 𝑦(𝑛) 𝑧(𝑛) 𝑥̇(𝑛) 𝑦̇(𝑛) 𝑧̇(𝑛) 𝑥̈(𝑛) 𝑦̈(𝑛) 𝑧̈(𝑛)] in Cartesian space. It should be noted that the measurement vector is related to the state vector through a non-linear transformation (due to trigonometric operations required to convert from spherical to Cartesian coordinates). A variant of Kalman Filter called the Extended Kalman Filter (EKF) is used in the group tracker that linearizes the nonlinear function using the derivative of the non-linear function around current state estimates. Please refer to the group tracker implementation guide for more details on the algorithm [1].
 
 
 
@@ -219,6 +221,98 @@ python main.py
 
 ---
 
+### Setting Up Autostart (Linux/Raspberry Pi)
+
+To configure the system to automatically start the fall detection application on boot, follow these steps:
+
+#### Step 1: Clone and Setup the Repository
+1. Open a terminal and clone the repository. If already the repository is already cloned, skip this step:
+   ```bash
+   git clone https://github.com/Turtlelord-2k/Ambient-Intelligence.git
+   ```
+
+2. Navigate to the repository directory:
+   ```bash
+   cd Ambient-Intelligence
+   ```
+
+3. Update to the latest version:
+   ```bash
+   git pull origin main
+   ```
+
+#### Step 2: Configure Autostart with Crontab
+1. Open the crontab editor:
+   ```bash
+   crontab -e
+   ```
+
+2. If prompted to choose an editor, select option 1 (nano) and press Enter.
+
+3. Navigate to the bottom of the file and add the following line:
+   ```bash
+   @reboot python3 /home/YOUR_USERNAME/Ambient-Intelligence/main.py > /home/YOUR_USERNAME/fall-detection-log.txt 2>&1
+   ```
+   
+   > **Important**: Replace `YOUR_USERNAME` with your actual system username. You can find your username by running `whoami` in the terminal.
+
+4. Save and exit the editor:
+   - Press `Ctrl + X`
+   - Press `Y` to confirm changes
+   - Press `Enter` to save
+
+#### Step 3: Configure the Config File Path
+1. Open the main.py file in a text editor:
+   ```bash
+   geany main.py
+   ```
+   
+   > **Note**: If `geany` is not installed, you can use `nano main.py` or any other text editor like `vim` or `code`.
+
+2. Locate the config file in your repository directory and copy its full path:
+   - Navigate to your repository folder in the file manager
+   - Right-click on `Final_config_6m.cfg`
+   - Select "Copy path" or "Copy location"
+
+3. In the text editor, navigate to line 214 and replace:
+   ```python
+   c.parseCfg("Final_config_6m.cfg")
+   ```
+   with:
+   ```python
+   c.parseCfg("/full/path/to/your/Final_config_6m.cfg")
+   ```
+   
+   > **Example**: If your username is `pi` and you cloned to the home directory, the path would be:
+   > ```python
+   > c.parseCfg("/home/pi/Ambient-Intelligence/Final_config_6m.cfg")
+   > ```
+
+4. Save the file (`Ctrl + S`) and close the editor.
+
+#### Step 4: Test the Setup
+1. Reboot your system to test the autostart functionality:
+   ```bash
+   sudo reboot
+   ```
+
+2. After reboot, check if the application is running:
+   ```bash
+   ps aux | grep python
+   ```
+
+3. You can also check the log file for any startup messages or errors:
+   ```bash
+   cat ~/fall-detection-log.txt
+   ```
+
+#### Additional Notes:
+- The log file (`fall-detection-log.txt`) will contain all output from the application, including any error messages.
+- If you need to stop the autostart service, edit the crontab again (`crontab -e`) and comment out or remove the line by adding a `#` at the beginning.
+- Make sure your device is properly connected before the system boots up for the autostart to work correctly.
+
+---
+
 ### Troubleshooting
 
 - **Issue**: "Command not found" for `git` or `python`.
@@ -243,7 +337,7 @@ Raspberry Pi Connect provides secure access to your Raspberry Pi from anywhere i
 
 To use Connect, install the Connect software and link your device with an account on your Raspberry Pi. Then visit connect.raspberrypi.com to access the desktop or a shell running on your Raspberry Pi in a browser window.
 
-Connect uses a secure, encrypted connection. By default, Connect communicates directly between your Raspberry Pi and your browser. However, when Connect can’t establish a direct connection between your Raspberry Pi and your browser, we use a relay server. In such cases, Raspberry Pi only retains the metadata required to operate Connect.
+Connect uses a secure, encrypted connection. By default, Connect communicates directly between your Raspberry Pi and your browser. However, when Connect can't establish a direct connection between your Raspberry Pi and your browser, we use a relay server. In such cases, Raspberry Pi only retains the metadata required to operate Connect.
 
 Connect is currently in the Beta phase of development.
 
@@ -289,7 +383,7 @@ rpi-connect off
 
 ### Link a Raspberry Pi device with a Connect account
 
-Now that you’ve installed and started Connect on your Raspberry Pi device, you must associate your device with your Connect account.
+Now that you've installed and started Connect on your Raspberry Pi device, you must associate your device with your Connect account.
 
 Use the following command to generate a link that will connect your device with your Connect account:
 ```bash
