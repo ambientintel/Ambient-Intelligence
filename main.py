@@ -10,7 +10,8 @@ from serial.tools import list_ports
 from contextlib import suppress
 import sys
 import platform
-from fall_detection import FallDetection 
+from fall_detection import FallDetection
+from mqtt_client import mqtt_client as client
 # from new_fall_detection import FallDetection
 
 class core:
@@ -216,6 +217,15 @@ if __name__=="__main__":
         c.sendCfg()
     else:
         print("Device is already configured")
+    
+    # Initialize MQTT client used to send data to AWS IoT Core following MQTT protocol
+    mqtt_client = client('a2c23jts9lq6zy-ats.iot.eu-north-1.amazonaws.com',cert='./certs/thing05.cert.pem', key='./certs/thing05.private.key', ca_file='./certs/root-CA.crt', client_id='thing05')
+
+    # Connect to MQTT broker
+    mqtt_client.connect()
+
+    # Subscribe to the topic
+    mqtt_client.subscribe('dev/ambient-intelligence-poc-topic/global')
 
     while True:
         trial_output = c.parser.readAndParseUartDoubleCOMPort()
@@ -271,6 +281,7 @@ if __name__=="__main__":
         c.frames.append(frameJSON)
         data['data'] = c.frames
         # print(data)
+        mqtt_client.publish(json.dumps(data), 'dev/ambient-intelligence-poc-topic/global', message_count=1)
         if (c.uartCounter % c.framesPerFile == 0):
             if(c.first_file is True): 
                 if(os.path.exists('TrackingData/') == False):
@@ -285,3 +296,5 @@ if __name__=="__main__":
 
         # print(c.fallDetection.heightBuffer)
     
+    # Disconnect from MQTT broker
+    mqtt_client.disconnect()

@@ -4,3 +4,5 @@ matplotlib
 json_fix
 pyserial
 AWSIoTPythonSDK
+awsiotsdk==1.22.2
+awscrt==0.24.1
