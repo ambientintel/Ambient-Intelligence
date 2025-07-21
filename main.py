@@ -219,7 +219,18 @@ if __name__=="__main__":
         print("Device is already configured")
     
     # Initialize MQTT client used to send data to AWS IoT Core following MQTT protocol
-    mqtt_client = client('a2c23jts9lq6zy-ats.iot.eu-north-1.amazonaws.com',cert='./certs/thing05.cert.pem', key='./certs/thing05.private.key', ca_file='./certs/root-CA.crt', client_id='thing05')
+    # TODO: Uncomment the one of the lines below to assign current device to a Thing in AWS IoT Core
+    # device_id = 'thing01'
+    # device_id = 'thing02'
+    # device_id = 'thing03'
+    # device_id = 'thing04'
+    device_id = 'thing05'
+    # device_id = 'thing06'
+    # device_id = 'thing07'
+    # device_id = 'thing08'
+    # device_id = 'thing09'
+    # device_id = 'thing10'
+    mqtt_client = client('a2c23jts9lq6zy-ats.iot.eu-north-1.amazonaws.com',cert=f'./certs/{device_id}.cert.pem', key=f'./certs/{device_id}.private.key', ca_file='./certs/root-CA.crt', client_id=device_id)
 
     # Connect to MQTT broker
     mqtt_client.connect()
