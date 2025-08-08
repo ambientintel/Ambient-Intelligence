@@ -12,6 +12,7 @@ import sys
 import platform
 from fall_detection import FallDetection
 from mqtt_client import mqtt_client as client
+import argparse
 # from new_fall_detection import FallDetection
 
 class core:
@@ -178,6 +179,13 @@ class core:
 
 
 if __name__=="__main__":
+    # Parse command line arguments
+    parser = argparse.ArgumentParser(description='Ambient Intelligence Main Program')
+    parser.add_argument('--send-mqtt', dest='send_mqtt', action='store_true',
+                        help='Enable sending data to AWS IoT Core via MQTT')
+    parser.set_defaults(send_mqtt=False)
+    args = parser.parse_args()
+
     # Optional: Specify a custom save filepath
     SAVE_FILEPATH = "./Data_files"  # Change this to your desired path
     CLI_SIL_SERIAL_PORT_NAME = 'Enhanced COM Port'
@@ -230,13 +238,14 @@ if __name__=="__main__":
     # device_id = 'thing08'
     # device_id = 'thing09'
     # device_id = 'thing10'
-    mqtt_client = client('a2c23jts9lq6zy-ats.iot.eu-north-1.amazonaws.com',cert=f'./certs/{device_id}.cert.pem', key=f'./certs/{device_id}.private.key', ca_file='./certs/root-CA.crt', client_id=device_id)
+    if args.send_mqtt:
+        mqtt_client = client('a2c23jts9lq6zy-ats.iot.eu-north-1.amazonaws.com', cert=f'./certs/{device_id}.cert.pem', key=f'./certs/{device_id}.private.key', ca_file='./certs/root-CA.crt', client_id=device_id)
 
-    # Connect to MQTT broker
-    mqtt_client.connect()
+        # Connect to MQTT broker
+        mqtt_client.connect()
 
-    # Subscribe to the topic
-    mqtt_client.subscribe('dev/ambient-intelligence-poc-topic/global')
+        # Subscribe to the topic
+        mqtt_client.subscribe('dev/ambient-intelligence-poc-topic/global')
 
     while True:
         trial_output = c.parser.readAndParseUartDoubleCOMPort()
@@ -292,7 +301,9 @@ if __name__=="__main__":
         c.frames.append(frameJSON)
         data['data'] = c.frames
         # print(data)
-        mqtt_client.publish(json.dumps(data), 'dev/ambient-intelligence-poc-topic/global', message_count=1)
+        if args.send_mqtt:
+            # Publish the data to the MQTT topic
+            mqtt_client.publish(json.dumps(data), 'dev/ambient-intelligence-poc-topic/global', message_count=1)
         if (c.uartCounter % c.framesPerFile == 0):
             if(c.first_file is True): 
                 if(os.path.exists('TrackingData/') == False):
@@ -307,5 +318,8 @@ if __name__=="__main__":
 
         # print(c.fallDetection.heightBuffer)
     
-    # Disconnect from MQTT broker
-    mqtt_client.disconnect()
+    if args.send_mqtt:
+        print("Disconnecting from MQTT broker...")
+        # Disconnect from MQTT broker
+        mqtt_client.disconnect()
+        print("Disconnected from MQTT broker.")
