@@ -11,7 +11,6 @@ from contextlib import suppress
 import sys
 import platform
 from fall_detection import FallDetection
-from mqtt_client import mqtt_client as client
 import argparse
 # from new_fall_detection import FallDetection
 
@@ -185,6 +184,10 @@ if __name__=="__main__":
                         help='Enable sending data to AWS IoT Core via MQTT')
     parser.set_defaults(send_mqtt=False)
     args = parser.parse_args()
+
+    # Import MQTT client module for AWS IoT Core'
+    if args.send_mqtt:
+        from mqtt_client import client
 
     # Optional: Specify a custom save filepath
     SAVE_FILEPATH = "./Data_files"  # Change this to your desired path
